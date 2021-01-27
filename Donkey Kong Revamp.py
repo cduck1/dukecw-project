@@ -27,7 +27,7 @@ clock = pygame.time.Clock()
 # Game class
 class Game(object):
     
-    def __init__():
+    def __init__(self):
         # CREATE GROUPS for each sprite here
         self.player_group = pygame.sprite.Group()
         self.allwall_group = pygame.sprite.Group()   # All wall group is a group including all inner and outer walls
@@ -45,7 +45,7 @@ class Game(object):
     def runlogic(self):
         self.all_sprites_group.update()
 
-    def display(self):
+    def display(self, screen):
         # Making the screen background black
         screen.fill(BLACK)
 
@@ -62,7 +62,7 @@ class Game(object):
                 return True
         return False
         
-    def levelsetup():
+    def levelsetup(self):
         for i in range (0,750):
             # temp_x and temp_y are the temporary values where the wall will be created for that iteration of the for loop, so if there is a 1 at that position, it will be created at a different x and y each time
             # We have an if i == 0 here because we need the walls to start at zero, if it didnt we would start with temp_x = temp_x + 40 and so fourth
@@ -121,8 +121,6 @@ class Game(object):
     # Innerwall class (basically the construction bars that mario runs along) - inherits everything from the outerwall class
     class innerwall(outerwall):
         pass
-
-
 
 
 # STAYS OUTSIDE OF ANY CLASS
