@@ -26,7 +26,6 @@ clock = pygame.time.Clock()
 
 # Game class
 class Game(object):
-    
     def __init__(self):
         # CREATE GROUPS for each sprite here
         self.player_group = pygame.sprite.Group()
@@ -39,6 +38,43 @@ class Game(object):
 
         # Setting the gameRunning flag to false
         self.gameRunning = True
+
+        # CREATING THE LAYOUT OF THE GAME USING A LIST 
+        # Plan for creating the walls: have a list of 625 items, create wall at a specific x and y coordinates if there is a 1; once you get to the 25th element (to the end of the screen), go you down 40 pixels and start at x coord 0
+        # Rows are sets of 30 elements
+        # There are 750 total elements because each element represent a block of 40 by 40 and 25 x 30 = 750
+        # Top and bottom walls (30 1s) = 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+        # Side walls = 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+        # 0 = nothing present
+        # 1 = outer wall present
+        # 2 = inner wall present
+        # 3 = player start point
+        # 4 = chest start point
+        self.level1 =  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,2,2,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,2,2,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 
 
     # Method where all the game logic goes
@@ -80,10 +116,10 @@ class Game(object):
                 temp_y = temp_y + 40
                 # 1s in the array represent outer walls
             if self.level1[i] == 1:
-                self.myOuterWall = outerwall(RED, 40, 40, temp_x, temp_y)
-                self.outerwall_group.add(myOuterWall)
-                self.allwall_group.add(myOuterWall)
-                self.all_sprites_group.add(myOuterWall)
+                self.myOuterWall = self.outerwall(RED, 40, 40, temp_x, temp_y)
+                self.outerwall_group.add(self.myOuterWall)
+                self.allwall_group.add(self.myOuterWall)
+                self.all_sprites_group.add(self.myOuterWall)
             # 2s in the array represent inner walls
             if self.level1[i] == 2:
                 self.myInnerWall = innerwall(RED, 40, 40, temp_x, temp_y)
@@ -97,6 +133,7 @@ class Game(object):
                 # Add the player to a player group and an all sprites group
                 self.player_group.add(myPlayer)
                 self.all_sprites_group.add(myPlayer)
+
     # CLASSES
     # Making the player class
     class player(pygame.sprite.Sprite):
