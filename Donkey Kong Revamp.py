@@ -37,6 +37,53 @@ class player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        # Set a speed vector
+        self.change_x = 0
+        self.change_y = 0
+        
+    def update(self):
+        # Player movement
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            self.changespeed(-5, 0)
+        if keys[pygame.K_RIGHT]:
+            self.changespeed(5, 0)
+        if keys[pygame.K_UP]:
+            self.changespeed(0, -5)
+        if keys[pygame.K_DOWN]:
+            self.changespeed(0, 5)
+
+        # Move the player left/right
+        self.rect.x += self.change_x
+        # Did we HIT A WALL while moving left/right
+        wall_hit_group = pygame.sprite.spritecollide(self, game.allwall_group, False)
+        for wall in wall_hit_group:
+            # If we are moving right, set our right side to the left side of the wall we hit
+            if self.change_x > 0:
+                self.rect.right = wall.rect.left
+            else:
+                # Otherwise if we are moving left, do the opposite
+                self.rect.left = wall.rect.right
+
+        # Move the player up/down
+        self.rect.y += self.change_y
+        # Did we hit a WALL while moving up/down
+        wall_hit_group = pygame.sprite.spritecollide(self, game.allwall_group, False)
+        for wall in wall_hit_group:
+            # Reset our position based on the top/bottom of the object.
+            if self.change_y > 0:
+                self.rect.bottom = wall.rect.top
+            else:
+                self.rect.top = wall.rect.bottom
+
+        # Resets the speed change to 0 every update so that the speed doesn't accelerate infinitely
+        self.change_x = 0
+        self.change_y = 0
+
+    # Change the x and y speed of the player
+    def changespeed(self, x, y):
+        self.change_x += x
+        self.change_y += y
 
 # Outerwall class
 class outerwall(pygame.sprite.Sprite):
@@ -50,9 +97,21 @@ class outerwall(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
-# Innerwall class (basically the construction bars that mario runs along) - inherits everything from the outerwall class
+# Innerwall class (basically the construction bars that player runs along) - inherits everything from the outerwall class
 class innerwall(outerwall):
     pass
+
+# Ladder class - when player collides with this he should be able to move up and down it - this is how he gets to the next construction piece/ layer
+class ladder(pygame.sprite.Sprite):
+    # Define the constructor for the wall class
+    def __init__(self, color, width, height, x, y):
+        super().__init__()
+        # Create a sprite and fill it with a the image
+        self.image = pygame.Surface([width,height])
+        self.image.fill(color)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
 
 # Game class
 class Game(object):
@@ -62,6 +121,7 @@ class Game(object):
         self.allwall_group = pygame.sprite.Group()   # All wall group is a group including all inner and outer walls
         self.outerwall_group = pygame.sprite.Group()
         self.innerwall_group = pygame.sprite.Group()
+        self.ladder_group = pygame.sprite.Group()
 
         # Create a group of all sprites together
         self.all_sprites_group = pygame.sprite.Group()
@@ -100,10 +160,10 @@ class Game(object):
                         1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-                        1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,2,2,2,2,2,2,2,2,2,2,4,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,2,2,2,2,2,2,2,2,2,2,4,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,3,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
                         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
         # Calls the method levelsetup() so to build the map - this is still in the __init__() function
         self.levelsetup()
@@ -164,6 +224,11 @@ class Game(object):
                 # Add the player to a player group and an all sprites group
                 self.player_group.add(self.myPlayer)
                 self.all_sprites_group.add(self.myPlayer)
+            if self.level1[i] == 4:
+                self.myLadder = ladder(YELLOW, 40, 40,temp_x, temp_y)
+                # Add the ladder to a player group and an all sprites group
+                self.ladder_group.add(self.myLadder)
+                self.all_sprites_group.add(self.myLadder)
 
 
 
