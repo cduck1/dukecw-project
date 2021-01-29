@@ -40,9 +40,11 @@ class player(pygame.sprite.Sprite):
         # Set a speed vector
         self.change_x = 0
         self.change_y = 0
+        # Variables
+        self.collisioncounter = 0
         
     def update(self):
-        # Player movement
+        # PLAYER MOVEMENT
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
             self.changespeed(-5, 0)
@@ -53,10 +55,12 @@ class player(pygame.sprite.Sprite):
             # Makes it so that player can only go up if he is in contact with the ladder
             if pygame.sprite.groupcollide(game.player_group, game.ladder_group, False, False):
                 self.changespeed(0, -5)
+                self.collisioncounter += 1
         if keys[pygame.K_DOWN]:
             # Makes it so that player can only go up if he is in contact with the ladder
             if pygame.sprite.groupcollide(game.player_group, game.ladder_group, False, False):
                 self.changespeed(0, 5)
+                self.collisioncounter += 1
 
         # Move the player left/right
         self.rect.x += self.change_x
@@ -69,6 +73,7 @@ class player(pygame.sprite.Sprite):
             else:
                 # Otherwise if we are moving left, do the opposite
                 self.rect.left = wall.rect.right
+            self.collisioncounter += 1
 
         # Move the player up/down
         self.rect.y += self.change_y
@@ -79,8 +84,18 @@ class player(pygame.sprite.Sprite):
             if self.change_y > 0:
                 self.rect.bottom = wall.rect.top
             else:
-                self.rect.top = wall.rect.bottom         
-            
+                self.rect.top = wall.rect.bottom
+            self.collisioncounter += 1
+
+
+        # GRAVITY - if the player is not colliding with anything, aka he is in the open space, make him fall to the ground (at which point he will be colliding with the ground)
+        if self.collisioncounter == 0:
+            self.changespeed(0, 20)
+
+        print(self.collisioncounter)
+
+        # Resets the collision counter every update to 0 or else the collision counter would stay 1 if anything was every touched.
+        self.collisioncounter = 0
 
         # Resets the speed change to 0 every update so that the speed doesn't accelerate infinitely
         self.change_x = 0
@@ -238,6 +253,7 @@ class Game(object):
                 # Add the player to a player group and an all sprites group
                 self.player_group.add(self.myPlayer)
                 self.all_sprites_group.add(self.myPlayer)
+
 
 
 # STAYS OUTSIDE OF ANY CLASS
