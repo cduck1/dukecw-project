@@ -48,10 +48,15 @@ class player(pygame.sprite.Sprite):
             self.changespeed(-5, 0)
         if keys[pygame.K_RIGHT]:
             self.changespeed(5, 0)
+        keys = pygame.key.get_pressed()
         if keys[pygame.K_UP]:
-            self.changespeed(0, -5)
+            # Makes it so that player can only go up if he is in contact with the ladder
+            if pygame.sprite.groupcollide(game.player_group, game.ladder_group, False, False):
+                self.changespeed(0, -5)
         if keys[pygame.K_DOWN]:
-            self.changespeed(0, 5)
+            # Makes it so that player can only go up if he is in contact with the ladder
+            if pygame.sprite.groupcollide(game.player_group, game.ladder_group, False, False):
+                self.changespeed(0, 5)
 
         # Move the player left/right
         self.rect.x += self.change_x
@@ -74,7 +79,8 @@ class player(pygame.sprite.Sprite):
             if self.change_y > 0:
                 self.rect.bottom = wall.rect.top
             else:
-                self.rect.top = wall.rect.bottom
+                self.rect.top = wall.rect.bottom         
+            
 
         # Resets the speed change to 0 every update so that the speed doesn't accelerate infinitely
         self.change_x = 0
@@ -156,14 +162,14 @@ class Game(object):
                         1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-                        1,0,0,0,2,2,2,2,2,2,2,2,2,2,4,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-                        1,0,0,0,2,2,2,2,2,2,2,2,2,2,4,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-                        1,0,3,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,4,2,2,2,2,2,2,2,2,2,2,2,2,2,4,2,2,2,2,2,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,4,2,2,2,2,2,2,2,2,2,2,2,2,2,4,2,2,2,2,2,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,2,2,2,2,2,2,2,2,2,4,4,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,2,2,4,2,2,2,2,2,2,0,0,0,0,0,0,0,1,
+                        1,0,0,0,2,2,2,2,2,2,2,2,2,4,4,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,2,2,4,2,2,2,2,2,2,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,3,0,0,0,0,0,0,0,0,0,0,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
                         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
         # Calls the method levelsetup() so to build the map - this is still in the __init__() function
         self.levelsetup()
@@ -217,19 +223,21 @@ class Game(object):
                 self.innerwall_group.add(self.myInnerWall)
                 self.allwall_group.add(self.myInnerWall)
                 self.all_sprites_group.add(self.myInnerWall)
-            # 3s in the array represent the starting position of the player
-            if self.level1[i] == 3:
-                # Instantiate the player class - colour, width, height, x, y, speed
-                self.myPlayer = player(BLUE, 40, 40, 20, 20, temp_x, temp_y)
-                # Add the player to a player group and an all sprites group
-                self.player_group.add(self.myPlayer)
-                self.all_sprites_group.add(self.myPlayer)
+            # 4s in the array represen the ladders
             if self.level1[i] == 4:
+                # Need to make is so the player can go down the ladders again
                 self.myLadder = ladder(YELLOW, 40, 40,temp_x, temp_y)
                 # Add the ladder to a player group and an all sprites group
                 self.ladder_group.add(self.myLadder)
                 self.all_sprites_group.add(self.myLadder)
-
+            # 3s in the array represent the starting position of the player
+            if self.level1[i] == 3:
+                # Instantiate the player class - colour, width, height, x, y, speed
+                # I need to make the player a better size so that its easier to go up ladders - but also need him to start on the floor
+                self.myPlayer = player(BLUE, 40, 40, 20, 20, temp_x, temp_y)
+                # Add the player to a player group and an all sprites group
+                self.player_group.add(self.myPlayer)
+                self.all_sprites_group.add(self.myPlayer)
 
 
 # STAYS OUTSIDE OF ANY CLASS
