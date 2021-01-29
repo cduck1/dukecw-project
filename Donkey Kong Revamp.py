@@ -41,7 +41,7 @@ class player(pygame.sprite.Sprite):
         self.change_x = 0
         self.change_y = 0
         # Variables
-        self.collisioncounter = 0
+        self.colliding = 0
         
     def update(self):
         # PLAYER MOVEMENT
@@ -55,12 +55,22 @@ class player(pygame.sprite.Sprite):
             # Makes it so that player can only go up if he is in contact with the ladder
             if pygame.sprite.groupcollide(game.player_group, game.ladder_group, False, False):
                 self.changespeed(0, -5)
-                self.collisioncounter += 1
+                game.gravity = False
         if keys[pygame.K_DOWN]:
             # Makes it so that player can only go up if he is in contact with the ladder
             if pygame.sprite.groupcollide(game.player_group, game.ladder_group, False, False):
                 self.changespeed(0, 5)
-                self.collisioncounter += 1
+                game.gravity = False
+                print(game.gravity)
+
+
+        # GRAVITY - if the player is not colliding with anything, aka he is in the open space, make him fall to the ground (at which point he will be colliding with the ground)
+        #if pygame.sprite.groupcollide(game.player_group,game.all_sprites_group,False,False):
+         #   self.colliding = True
+        #else:
+         #   self.colliding = False
+        if game.gravity == True:
+            self.changespeed(0,3)
 
         # Move the player left/right
         self.rect.x += self.change_x
@@ -73,7 +83,6 @@ class player(pygame.sprite.Sprite):
             else:
                 # Otherwise if we are moving left, do the opposite
                 self.rect.left = wall.rect.right
-            self.collisioncounter += 1
 
         # Move the player up/down
         self.rect.y += self.change_y
@@ -85,17 +94,11 @@ class player(pygame.sprite.Sprite):
                 self.rect.bottom = wall.rect.top
             else:
                 self.rect.top = wall.rect.bottom
-            self.collisioncounter += 1
 
-
-        # GRAVITY - if the player is not colliding with anything, aka he is in the open space, make him fall to the ground (at which point he will be colliding with the ground)
-        if self.collisioncounter == 0:
-            self.changespeed(0, 20)
-
-        print(self.collisioncounter)
+        
 
         # Resets the collision counter every update to 0 or else the collision counter would stay 1 if anything was every touched.
-        self.collisioncounter = 0
+        self.colliding = False
 
         # Resets the speed change to 0 every update so that the speed doesn't accelerate infinitely
         self.change_x = 0
@@ -105,6 +108,7 @@ class player(pygame.sprite.Sprite):
     def changespeed(self, x, y):
         self.change_x += x
         self.change_y += y
+
 
 # Outerwall class
 class outerwall(pygame.sprite.Sprite):
@@ -149,6 +153,9 @@ class Game(object):
 
         # Setting the gameRunning flag to false - when the game is exited, the eventprocess() method returns True, making done = True, which exits the game
         self.gameRunning = True
+
+        # Variables
+        self.gravity = True
 
         # CREATING THE LAYOUT OF THE GAME USING A LIST 
         # Plan for creating the walls: have a list of 1200 items, create wall at a specific x and y coordinates if there is a 1; once you get to the 48th element (to the end of the screen), go you down 40 pixels and start at x coord 0
