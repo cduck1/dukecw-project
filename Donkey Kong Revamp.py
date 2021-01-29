@@ -40,8 +40,6 @@ class player(pygame.sprite.Sprite):
         # Set a speed vector
         self.change_x = 0
         self.change_y = 0
-        # Variables
-        self.colliding = 0
         
     def update(self):
         # PLAYER MOVEMENT
@@ -55,20 +53,13 @@ class player(pygame.sprite.Sprite):
             # Makes it so that player can only go up if he is in contact with the ladder
             if pygame.sprite.groupcollide(game.player_group, game.ladder_group, False, False):
                 self.changespeed(0, -5)
-                game.gravity = False
         if keys[pygame.K_DOWN]:
             # Makes it so that player can only go up if he is in contact with the ladder
             if pygame.sprite.groupcollide(game.player_group, game.ladder_group, False, False):
                 self.changespeed(0, 5)
-                game.gravity = False
-                print(game.gravity)
 
 
         # GRAVITY - if the player is not colliding with anything, aka he is in the open space, make him fall to the ground (at which point he will be colliding with the ground)
-        #if pygame.sprite.groupcollide(game.player_group,game.all_sprites_group,False,False):
-         #   self.colliding = True
-        #else:
-         #   self.colliding = False
         if game.gravity == True:
             self.changespeed(0,3)
 
@@ -94,11 +85,6 @@ class player(pygame.sprite.Sprite):
                 self.rect.bottom = wall.rect.top
             else:
                 self.rect.top = wall.rect.bottom
-
-        
-
-        # Resets the collision counter every update to 0 or else the collision counter would stay 1 if anything was every touched.
-        self.colliding = False
 
         # Resets the speed change to 0 every update so that the speed doesn't accelerate infinitely
         self.change_x = 0
@@ -137,6 +123,11 @@ class ladder(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+    # Put this here because then
+    def update(self):
+        ladder_hit_group = pygame.sprite.spritecollide(self, game.ladder_group, False)
+        for self in ladder_hit_group:
+            game.gravity = False
 
 # Game class
 class Game(object):
