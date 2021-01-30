@@ -53,16 +53,36 @@ class player(pygame.sprite.Sprite):
             # Makes it so that player can only go up if he is in contact with the ladder
             if pygame.sprite.groupcollide(game.player_group, game.ladder_group, False, False):
                 self.changespeed(0, -5)
+                game.gravity = False
+            else:
+                game.gravity = True
         if keys[pygame.K_DOWN]:
             # Makes it so that player can only go up if he is in contact with the ladder
             if pygame.sprite.groupcollide(game.player_group, game.ladder_group, False, False):
                 self.changespeed(0, 5)
+                game.gravity = False
+            else:
+                game.gravity = True
 
 
         # GRAVITY - if the player is not colliding with anything, aka he is in the open space, make him fall to the ground (at which point he will be colliding with the ground)
         if game.gravity == True:
             self.changespeed(0,3)
 
+        # Made this code functions because it cleans up the previously cluttered update function significantly
+        self.movehorizontal()
+        self.movevertical()
+
+        # Resets the speed change to 0 every update so that the speed doesn't accelerate infinitely
+        self.change_x = 0
+        self.change_y = 0
+
+    # Change the x and y speed of the player
+    def changespeed(self, x, y):
+        self.change_x += x
+        self.change_y += y
+
+    def movehorizontal(self):
         # Move the player left/right
         self.rect.x += self.change_x
         # Did we HIT A WALL while moving left/right
@@ -75,6 +95,7 @@ class player(pygame.sprite.Sprite):
                 # Otherwise if we are moving left, do the opposite
                 self.rect.left = wall.rect.right
 
+    def movevertical(self):
         # Move the player up/down
         self.rect.y += self.change_y
         # Did we hit a WALL while moving up/down
@@ -85,15 +106,6 @@ class player(pygame.sprite.Sprite):
                 self.rect.bottom = wall.rect.top
             else:
                 self.rect.top = wall.rect.bottom
-
-        # Resets the speed change to 0 every update so that the speed doesn't accelerate infinitely
-        self.change_x = 0
-        self.change_y = 0
-
-    # Change the x and y speed of the player
-    def changespeed(self, x, y):
-        self.change_x += x
-        self.change_y += y
 
 
 # Outerwall class
@@ -122,12 +134,7 @@ class ladder(pygame.sprite.Sprite):
         self.image.fill(color)
         self.rect = self.image.get_rect()
         self.rect.x = x
-        self.rect.y = y
-    # Put this here because then
-    def update(self):
-        ladder_hit_group = pygame.sprite.spritecollide(self, game.ladder_group, False)
-        for self in ladder_hit_group:
-            game.gravity = False
+        self.rect.y = y        
 
 # Game class
 class Game(object):
