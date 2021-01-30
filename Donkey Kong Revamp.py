@@ -45,22 +45,23 @@ class player(pygame.sprite.Sprite):
         # PLAYER MOVEMENT
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
+            game.gravity = True # This seemingly extra gravity = true just ensures that when the player moves off the ladder mid way up, they will always fall again
             self.changespeed(-5, 0)
         if keys[pygame.K_RIGHT]:
+            game.gravity = True # This seemingly extra gravity = true just ensures that when the player moves off the ladder mid way up, they will always fall again
             self.changespeed(5, 0)
-        keys = pygame.key.get_pressed()
         if keys[pygame.K_UP]:
-            # Makes it so that player can only go up if he is in contact with the ladder
+            # Makes it so that player can only go up if he is in contact with the ladder and turns gravity off while the player is on the ladder
             if pygame.sprite.groupcollide(game.player_group, game.ladder_group, False, False):
-                self.changespeed(0, -5)
                 game.gravity = False
+                self.changespeed(0, -5)
             else:
                 game.gravity = True
         if keys[pygame.K_DOWN]:
-            # Makes it so that player can only go up if he is in contact with the ladder
+            # Makes it so that player can only go down if he is in contact with the ladder and turns gravity off while the player is on the ladder
             if pygame.sprite.groupcollide(game.player_group, game.ladder_group, False, False):
-                self.changespeed(0, 5)
                 game.gravity = False
+                self.changespeed(0, 5)
             else:
                 game.gravity = True
 
@@ -134,7 +135,7 @@ class ladder(pygame.sprite.Sprite):
         self.image.fill(color)
         self.rect = self.image.get_rect()
         self.rect.x = x
-        self.rect.y = y        
+        self.rect.y = y
 
 # Game class
 class Game(object):
