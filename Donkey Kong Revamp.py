@@ -54,6 +54,7 @@ class player(pygame.sprite.Sprite):
                 self.changespeed(0, 5)
         else:
             game.gravity = True # When the player is not touching the ladder, gravity is on
+        # Standard left/right movement of the player
         if keys[pygame.K_LEFT]:
             self.changespeed(-5, 0)
         if keys[pygame.K_RIGHT]:
