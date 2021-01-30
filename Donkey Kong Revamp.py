@@ -47,20 +47,17 @@ class player(pygame.sprite.Sprite):
         # Player movement up and down ladders
         # Makes it so that player can only go up/down if he is in contact with the ladder and turns gravity off while the player is on the ladder
         if pygame.sprite.groupcollide(game.player_group, game.ladder_group, False, False):
-            game.gravity = False
+            game.gravity = False # When colliding with the ladder gravity is off
             if keys[pygame.K_UP]:
                 self.changespeed(0, -5)
             if keys[pygame.K_DOWN]:
                 self.changespeed(0, 5)
+        else:
+            game.gravity = True # When the player is not touching the ladder, gravity is on
         if keys[pygame.K_LEFT]:
-            # When not on a ladder, gravity = true and you move left when the left button is pressed
-            if not(pygame.sprite.groupcollide(game.player_group, game.ladder_group, False, False)):
-                game.gravity = True # This seemingly extra gravity = true just ensures that when the player moves off the ladder mid way up, they will always fall again
             self.changespeed(-5, 0)
         if keys[pygame.K_RIGHT]:
-            if not(pygame.sprite.groupcollide(game.player_group, game.ladder_group, False, False)):
-                game.gravity = True # This seemingly extra gravity = true just ensures that when the player moves off the ladder mid way up, they will always fall again
-            self.changespeed(5, 0)            
+            self.changespeed(5, 0)
 
         # GRAVITY - if the player is not colliding with anything, aka he is in the open space, make him fall to the ground (at which point he will be colliding with the ground)
         if game.gravity == True:
