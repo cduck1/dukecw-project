@@ -40,6 +40,9 @@ class player(pygame.sprite.Sprite):
         # Set a speed vector
         self.change_x = 0
         self.change_y = 0
+        # Variables
+        self.isJump = False
+
         
     def update(self):
         # PLAYER MOVEMENT
@@ -59,6 +62,20 @@ class player(pygame.sprite.Sprite):
             self.changespeed(-5, 0)
         if keys[pygame.K_RIGHT]:
             self.changespeed(5, 0)
+        # Jumping
+        if self.isJump == False: # If mario is not jumping
+            if keys[pygame.K_SPACE]: # and if space is pressed
+                self.isJump = True
+                for x in range (0,20):
+                    self.changespeed(0,-1) # Go up 3 pixels for every update function
+        
+        # If the player lands on part of the map (a floor or a ladder), he can jump again
+        map_hit_group = pygame.sprite.spritecollide(self, game.map_group, False)
+        for mapobject in map_hit_group:
+                self.isJump = False
+                
+            
+            
 
         # GRAVITY - if the player is not colliding with anything, aka he is in the open space, make him fall to the ground (at which point he will be colliding with the ground)
         if game.gravity == True:
@@ -140,6 +157,7 @@ class Game(object):
         self.outerwall_group = pygame.sprite.Group()
         self.innerwall_group = pygame.sprite.Group()
         self.ladder_group = pygame.sprite.Group()
+        self.map_group = pygame.sprite.Group() # This is a group for object that are part of the map (ladders and all walls) - used in the jumping mechanics
 
         # Create a group of all sprites together
         self.all_sprites_group = pygame.sprite.Group()
@@ -231,12 +249,14 @@ class Game(object):
                 self.myOuterWall = outerwall(RED, 40, 40, temp_x, temp_y)
                 self.outerwall_group.add(self.myOuterWall)
                 self.allwall_group.add(self.myOuterWall)
+                self.map_group.add(self.myOuterWall)
                 self.all_sprites_group.add(self.myOuterWall)
             # 2s in the array represent inner walls
             if self.level1[i] == 2:
                 self.myInnerWall = innerwall(RED, 40, 40, temp_x, temp_y)
                 self.innerwall_group.add(self.myInnerWall)
                 self.allwall_group.add(self.myInnerWall)
+                self.map_group.add(self.myInnerWall)
                 self.all_sprites_group.add(self.myInnerWall)
             # 4s in the array represen the ladders
             if self.level1[i] == 4:
@@ -244,6 +264,7 @@ class Game(object):
                 self.myLadder = ladder(YELLOW, 40, 40,temp_x, temp_y-1) # The reason for the temp_y-1 is so that when the player moves across the top of a ladder, then dont start moving down and then get stuck and gravity is off the whole way across with it like this
                 # Add the ladder to a player group and an all sprites group
                 self.ladder_group.add(self.myLadder)
+                self.map_group.add(self.myInnerWall)
                 self.all_sprites_group.add(self.myLadder)
             # 3s in the array represent the starting position of the player
             if self.level1[i] == 3:
