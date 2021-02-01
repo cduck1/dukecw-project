@@ -67,7 +67,7 @@ class player(pygame.sprite.Sprite):
             if keys[pygame.K_SPACE]: # and if space is pressed
                 self.isJump = True
                 for x in range (0,30):
-                    self.changespeed(0,-1) # Go up 1 pixel 20 times - gives a smoother jump motion and gravity brings the player back down           
+                    self.changespeed(0,-1) # Go up 1 pixel 30 times - gives a smoother jump motion and gravity brings the player back down           
             
         # GRAVITY - if the player is not colliding with anything, aka he is in the open space, make him fall to the ground (at which point he will be colliding with the ground)
         if game.gravity == True:
@@ -105,7 +105,7 @@ class player(pygame.sprite.Sprite):
         # Did we hit a WALL while moving up/down
         wall_hit_group = pygame.sprite.spritecollide(self, game.allwall_group, False)
         for wall in wall_hit_group:
-            # Because we are touching the floor, we reset the ability to jump
+            # Because we are touching the floor, we reset the ability to jump - you cant jump while on ladders
             self.isJump = False
             # Reset our position based on the top/bottom of the object.
             if self.change_y > 0:
