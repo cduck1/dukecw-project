@@ -67,8 +67,8 @@ class player(pygame.sprite.Sprite):
             if keys[pygame.K_SPACE]: # and if space is pressed
                 self.isJump = True
                 for x in range (0,30):
-                    self.changespeed(0,-1) # Go up 1 pixel 30 times - gives a smoother jump motion and gravity brings the player back down           
-            
+                    self.changespeed(0,-1) # Go up 1 pixel 30 times - gives a smoother jump motion and gravity brings the player back down
+        
         # GRAVITY - if the player is not colliding with anything, aka he is in the open space, make him fall to the ground (at which point he will be colliding with the ground)
         if game.gravity == True:
             self.changespeed(0,3)
