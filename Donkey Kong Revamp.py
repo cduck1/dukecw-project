@@ -42,7 +42,6 @@ class player(pygame.sprite.Sprite):
         self.change_y = 0
         # Variables
         self.isJump = False
-        self.count = 10
 
         
     def update(self):
@@ -67,33 +66,8 @@ class player(pygame.sprite.Sprite):
         if self.isJump == False: # If mario is not jumping
             if keys[pygame.K_SPACE]: # and if space is pressed
                 self.isJump = True
-                if self.count == 1:
-                    self.changespeed(0,-2)
-                if self.count == 2:
-                    self.changespeed(0,-2)
-                if self.count == 3:
-                    self.changespeed(0,-2)
-                if self.count == 4:
-                    self.changespeed(0,-2)
-                if self.count == 5:
-                    self.changespeed(0,-2)
-                if self.count == 6:
-                    self.changespeed(0,-2)
-                if self.count == 7:
-                    self.changespeed(0,-2)
-                if self.count == 8:
-                    self.changespeed(0,-2)
-                if self.count == 9:
-                    self.changespeed(0,-2)
-                if self.count == 10:
-                    self.changespeed(0,-2)
-                if self.count == 0 and self.isJump == False:
-                    self.count = 10
-                self.count = self.count - 1
-
-
-                #for x in range (0,30):
-                #    self.changespeed(0,-1) # Go up 1 pixel 30 times - gives a smoother jump motion and gravity brings the player back down
+                for x in range (0,30):
+                    self.changespeed(0,-1) # Go up 1 pixel 30 times - gives a smoother jump motion and gravity brings the player back down
 
         # GRAVITY - if the player is not colliding with anything, aka he is in the open space, make him fall to the ground (at which point he will be colliding with the ground)
         if game.gravity == True:
@@ -223,11 +197,11 @@ class Game(object):
                         1,0,0,0,0,2,2,4,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,2,2,4,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-                        1,0,0,0,0,0,0,4,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-                        1,0,0,0,0,0,0,4,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,2,4,2,0,0,0,0,1,
-                        1,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,4,2,0,0,0,0,1,
-                        1,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,1,
-                        1,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,4,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,4,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,4,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,4,2,0,0,0,0,0,0,0,0,0,0,2,4,2,0,0,0,0,1,
+                        1,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,2,4,2,0,0,0,0,1,
+                        1,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,1,
+                        1,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,1,
                         1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,4,2,2,2,2,2,2,2,2,2,2,2,2,2,4,2,2,2,2,2,0,0,0,1,
                         1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,4,2,2,2,2,2,2,2,2,2,2,2,2,2,4,2,2,2,2,2,0,0,0,1,
                         1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,1,
