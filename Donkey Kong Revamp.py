@@ -42,6 +42,7 @@ class player(pygame.sprite.Sprite):
         self.change_y = 0
         # Variables
         self.isJump = False
+        self.count = 10
 
         
     def update(self):
@@ -66,30 +67,29 @@ class player(pygame.sprite.Sprite):
         if self.isJump == False: # If mario is not jumping
             if keys[pygame.K_SPACE]: # and if space is pressed
                 self.isJump = True
-                count = 10
-                if count == 1:
+                if self.count == 1:
                     self.changespeed(0,-2)
-                if count == 2:
+                if self.count == 2:
                     self.changespeed(0,-2)
-                if count == 3:
+                if self.count == 3:
                     self.changespeed(0,-2)
-                if count == 4:
+                if self.count == 4:
                     self.changespeed(0,-2)
-                if count == 5:
+                if self.count == 5:
                     self.changespeed(0,-2)
-                if count == 6:
+                if self.count == 6:
                     self.changespeed(0,-2)
-                if count == 7:
+                if self.count == 7:
                     self.changespeed(0,-2)
-                if count == 8:
+                if self.count == 8:
                     self.changespeed(0,-2)
-                if count == 9:
+                if self.count == 9:
                     self.changespeed(0,-2)
-                if count == 10:
+                if self.count == 10:
                     self.changespeed(0,-2)
-                if count == 0 and self.isJump == False:
-                    count = 10
-                count = count - 1
+                if self.count == 0 and self.isJump == False:
+                    self.count = 10
+                self.count = self.count - 1
 
 
                 #for x in range (0,30):
