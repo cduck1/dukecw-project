@@ -51,6 +51,7 @@ class player(pygame.sprite.Sprite):
         # Makes it so that player can only go up/down if he is in contact with the ladder and turns gravity off while the player is on the ladder
         if pygame.sprite.groupcollide(game.player_group, game.ladder_group, False, False):
             game.gravity = False # When colliding with the ladder gravity is off
+            self.isJump = True # Make isJump true while colliding with the ladder so that the player cannot just while on the ladder
             if keys[pygame.K_UP]:
                 self.changespeed(0, -5)
             if keys[pygame.K_DOWN]:
@@ -64,14 +65,8 @@ class player(pygame.sprite.Sprite):
             self.changespeed(5, 0)
 
         # Jumping
-        for mappart in game.map_group:
-            if pygame.sprite.spritecollide(self, mappart, False):
-                self.isJump = True
-            else:
-                self.isJump = False
-
-        if keys[pygame.K_SPACE]: # If space is pressed
-            if self.isJump == False: # And if mario is not jumping and not in mid air (is touching a floor piece)
+        if self.isJump == False: # If mario is not jumping
+            if keys[pygame.K_SPACE]: # and if space is pressed
                 self.isJump = True
                 for x in range (0,30):
                     self.changespeed(0,-1) # Go up 1 pixel 30 times - gives a smoother jump motion and gravity brings the player back down
@@ -114,7 +109,7 @@ class player(pygame.sprite.Sprite):
         wall_hit_group = pygame.sprite.spritecollide(self, game.allwall_group, False)
         for wall in wall_hit_group:
             # Because we are touching the floor, we reset the ability to jump - you cant jump while on ladders
-            #self.isJump = False
+            self.isJump = False
             # Reset our position based on the top/bottom of the object.
             if self.change_y > 0:
                 self.rect.bottom = wall.rect.top
