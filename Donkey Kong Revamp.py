@@ -64,19 +64,9 @@ class player(pygame.sprite.Sprite):
         if keys[pygame.K_RIGHT]:
             self.changespeed(5, 0)
 
-        # Jumping
-        if self.isJump == False: # If mario is not jumping
-            if keys[pygame.K_SPACE]: # and if space is pressed
-                self.isJump = True
-                for x in range (0,30):
-                    self.changespeed(0,-1) # Go up 1 pixel 30 times - gives a smoother jump motion and gravity brings the player back down
-
-
-        # GRAVITY - if the player is not colliding with anything, aka he is in the open space, make him fall to the ground (at which point he will be colliding with the ground)
-        if game.gravity == True:
-            self.changespeed(0,3)
-
         # Made this code functions because it cleans up the previously cluttered update function significantly
+        self.jumping()
+        self.gravity()
         self.movehorizontal()
         self.movevertical()
 
@@ -88,6 +78,20 @@ class player(pygame.sprite.Sprite):
     def changespeed(self, x, y):
         self.change_x += x
         self.change_y += y
+
+    def jumping(self):
+        keys = pygame.key.get_pressed()
+        # Jumping
+        if self.isJump == False: # If mario is not jumping
+            if keys[pygame.K_SPACE]: # and if space is pressed
+                self.isJump = True
+                for x in range (0,30):
+                    self.changespeed(0,-1) # Go up 1 pixel 30 times - gives a smoother jump motion and gravity brings the player back down
+
+    def gravity(self):
+        # GRAVITY - if the player is not colliding with anything, aka he is in the open space, make him fall to the ground (at which point he will be colliding with the ground)
+        if game.gravity == True:
+            self.changespeed(0,3)
 
     def movehorizontal(self):
         # Move the player left/right
