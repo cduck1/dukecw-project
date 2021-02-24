@@ -9,6 +9,7 @@ BLUE = (0,0,255)
 YELLOW = (255,255,0)
 PINK = (255,20,147)
 PURPLE = (138,43,226)
+ORANGE = (255,165,0)
 
 pygame.init()
 
@@ -73,7 +74,7 @@ class player(pygame.sprite.Sprite):
         # Resets the speed change to 0 every update so that the speed doesn't accelerate infinitely
         self.change_x = 0
         self.change_y = 0
-
+        print(game.gravity)
     # Change the x and y speed of the player
     def changespeed(self, x, y):
         self.change_x += x
@@ -162,6 +163,52 @@ class door(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
+# Barrel class
+class barrel(pygame.sprite.Sprite):
+    # Define the constructor for the wall class
+    def __init__(self, color, width, height, x, y):
+        super().__init__()
+        # Create a sprite and fill it with a the image
+        self.image = pygame.Surface([width,height])
+        self.image.fill(color)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        # Set a speed vector
+        self.change_x = 0
+        self.change_y = 0
+
+    def update(self):
+        self.barrelgravity()
+        self.movement()
+        # Resets the speed change to 0 every update so that the speed doesn't accelerate infinitely
+        self.change_x = 0
+        self.change_y = 0
+
+    def barrelgravity(self):
+            # GRAVITY - if the barrel is not colliding with anything, aka he is in the open space, make him fall to the ground (at which point he will be colliding with the ground)
+            # Barrelgravity is slightly slower than player gravity
+            if game.gravity == True:
+                self.changespeed(0,2)
+    
+    def movement(self):
+        # Move the player up/down
+        self.rect.y += self.change_y
+        # Did we hit a wall while moving up/down
+        wall_hit_group = pygame.sprite.spritecollide(self, game.allwall_group, False)
+        for wall in wall_hit_group:
+            # Ensures the barrel doesn't fall through the wall
+            if self.change_y > 0:
+                self.rect.bottom = wall.rect.top
+            else:
+                self.rect.top = wall.rect.bottom
+
+    # Change the x and y speed of the player
+    def changespeed(self, x, y):
+        self.change_x += x
+        self.change_y += y
+
+
 # Game class
 class Game(object):
     def __init__(self):
@@ -172,8 +219,9 @@ class Game(object):
         self.innerwall_group = pygame.sprite.Group()
         self.ladder_group = pygame.sprite.Group()
         self.door_group = pygame.sprite.Group()
+        self.barrel_group = pygame.sprite.Group()
         self.map_group = pygame.sprite.Group() # This is a group for object that are part of the map (ladders and all walls) - used in the jumping mechanics
-
+        
         # Create a group of all sprites together
         self.all_sprites_group = pygame.sprite.Group()
 
@@ -195,7 +243,7 @@ class Game(object):
         # 2 = inner wall present
         # 3 = player start point
         self.level1 =  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,2,2,2,2,2,4,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
@@ -280,11 +328,18 @@ class Game(object):
                 self.ladder_group.add(self.myLadder)
                 self.map_group.add(self.myInnerWall)
                 self.all_sprites_group.add(self.myLadder)
+            # 5s in the array represent doors
             if self.level1[i] == 5:
                 self.myDoor = door(PURPLE, 40, 40, temp_x, temp_y)
                 # Add the door to a door group and an all sprites group
                 self.door_group.add(self.myDoor)
                 self.all_sprites_group.add(self.myDoor)
+            # 6s in the array represent barrels
+            if self.level1[i] == 6:
+                self.myBarrel = barrel(ORANGE, 40, 40, temp_x, temp_y)
+                # Add the barrel to a barrel group and an all sprites group
+                self.barrel_group.add(self.myBarrel)
+                self.all_sprites_group.add(self.myBarrel)
 
             # 3s in the array represent the starting position of the player
             if self.level1[i] == 3:
