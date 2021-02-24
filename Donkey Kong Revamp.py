@@ -105,6 +105,8 @@ class player(pygame.sprite.Sprite):
     def movevertical(self):
         # Move the player up/down
         self.rect.y += self.change_y
+        # This make the self.isJump 'default' to True, so the player cannot jump unless the player's ability to jump is reset when they touch the floor - essentially stop the player jumping in the air
+        self.isJump = True
         # Did we hit a WALL while moving up/down
         wall_hit_group = pygame.sprite.spritecollide(self, game.allwall_group, False)
         for wall in wall_hit_group:
@@ -115,7 +117,6 @@ class player(pygame.sprite.Sprite):
                 self.rect.bottom = wall.rect.top
             else:
                 self.rect.top = wall.rect.bottom
-
 
 # Outerwall class
 class outerwall(pygame.sprite.Sprite):
