@@ -43,6 +43,7 @@ class player(pygame.sprite.Sprite):
         self.change_y = 0
         # Variables
         self.isJump = False
+        self.gravity = True
 
         
     def update(self):
@@ -51,14 +52,14 @@ class player(pygame.sprite.Sprite):
         # Player movement up and down ladders
         # Makes it so that player can only go up/down if he is in contact with the ladder and turns gravity off while the player is on the ladder
         if pygame.sprite.groupcollide(game.player_group, game.ladder_group, False, False):
-            game.gravity = False # When colliding with the ladder gravity is off
+            self.gravity = False # When colliding with the ladder gravity is off
             self.isJump = True # Make isJump true while colliding with the ladder so that the player cannot just while on the ladder
             if keys[pygame.K_UP]:
                 self.changespeed(0, -5)
             if keys[pygame.K_DOWN]:
                 self.changespeed(0, 5)
         else:
-            game.gravity = True # When the player is not touching the ladder, gravity is on
+            self.gravity = True # When the player is not touching the ladder, gravity is on
         # Standard left/right movement of the player
         if keys[pygame.K_LEFT]:
             self.changespeed(-5, 0)
@@ -67,14 +68,13 @@ class player(pygame.sprite.Sprite):
 
         # Made this code functions because it cleans up the previously cluttered update function significantly
         self.jumping()
-        self.gravity()
+        self.gravityon()
         self.movehorizontal()
         self.movevertical()
 
         # Resets the speed change to 0 every update so that the speed doesn't accelerate infinitely
         self.change_x = 0
         self.change_y = 0
-        print(game.gravity)
 
     # Change the x and y speed of the player
     def changespeed(self, x, y):
@@ -90,9 +90,9 @@ class player(pygame.sprite.Sprite):
                 for x in range (0,30):
                     self.changespeed(0,-1) # Go up 1 pixel 30 times - gives a smoother jump motion and gravity brings the player back down
 
-    def gravity(self):
+    def gravityon(self):
         # GRAVITY - if the player is not colliding with anything, aka he is in the open space, make him fall to the ground (at which point he will be colliding with the ground)
-        if game.gravity == True:
+        if self.gravity == True:
             self.changespeed(0,3)
 
     def movehorizontal(self):
@@ -116,8 +116,8 @@ class player(pygame.sprite.Sprite):
         # Did we hit a WALL while moving up/down
         wall_hit_group = pygame.sprite.spritecollide(self, game.allwall_group, False)
         for wall in wall_hit_group:
-            # This game.gravity ensures that there is no gravity acting on the player while the player is touching the ground (not side walls, only ground walls) - this is done because I think it will likely make the game run faster
-            game.gravity = False
+            # This self.gravity ensures that there is no gravity acting on the player while the player is touching the ground (not side walls, only ground walls) - this is done because I think it will likely make the game run faster
+            self.gravity = False
             # Because we are touching the floor, we reset the ability to jump - you cant jump while on ladders
             self.isJump = False
             # Reset our position based on the top/bottom of the object.
@@ -180,6 +180,8 @@ class barrel(pygame.sprite.Sprite):
         # Set a speed vector
         self.change_x = 0
         self.change_y = 0
+        # Variables
+        self.gravity = True
 
     def update(self):
         self.barrelgravity()
@@ -189,10 +191,10 @@ class barrel(pygame.sprite.Sprite):
         self.change_y = 0
 
     def barrelgravity(self):
-            # GRAVITY - if the barrel is not colliding with anything, aka he is in the open space, make him fall to the ground (at which point he will be colliding with the ground)
-            # Barrelgravity is slightly slower than player gravity
-            if game.gravity == True:
-                self.changespeed(0,2)
+        # GRAVITY - if the barrel is not colliding with anything, aka he is in the open space, make him fall to the ground (at which point he will be colliding with the ground)
+        # Barrelgravity is slightly slower than player gravity
+        if self.gravity == True:
+            self.changespeed(0,2)
     
     def movement(self):
         # Move the player up/down
@@ -200,6 +202,8 @@ class barrel(pygame.sprite.Sprite):
         # Did we hit a wall while moving up/down
         wall_hit_group = pygame.sprite.spritecollide(self, game.allwall_group, False)
         for wall in wall_hit_group:
+            # This self.gravity ensures that there is no gravity acting on the barrel while the barrel is touching the ground (not side walls, only ground walls) - this is done because I think it will likely make the game run faster
+            self.gravity = False
             # Ensures the barrel doesn't fall through the wall
             if self.change_y > 0:
                 self.rect.bottom = wall.rect.top
@@ -230,9 +234,6 @@ class Game(object):
 
         # Setting the gameRunning flag to false - when the game is exited, the eventprocess() method returns True, making done = True, which exits the game
         self.gameRunning = True
-
-        # Variables
-        self.gravity = True
 
         # CREATING THE LAYOUT OF THE GAME USING A LIST 
         # Plan for creating the walls: have a list of 1200 items, create wall at a specific x and y coordinates if there is a 1; once you get to the 48th element (to the end of the screen), go you down 40 pixels and start at x coord 0
