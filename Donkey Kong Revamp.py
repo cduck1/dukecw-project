@@ -1,4 +1,5 @@
 import pygame
+import random
 
 # Defining colours
 BLACK = (0,0,0)
@@ -182,13 +183,22 @@ class barrel(pygame.sprite.Sprite):
         self.change_y = 0
         # Variables
         self.gravity = True
+        self.goleft = False
+        self.goright = False
 
     def update(self):
         self.barrelgravity()
-        self.movement()
+        self.movementy()
+        self.movementx()
+
         # Resets the speed change to 0 every update so that the speed doesn't accelerate infinitely
         self.change_x = 0
         self.change_y = 0
+
+    # Change the x and y speed of the player
+    def changespeed(self, x, y):
+        self.change_x += x
+        self.change_y += y
 
     def barrelgravity(self):
         # GRAVITY - if the barrel is not colliding with anything, aka he is in the open space, make him fall to the ground (at which point he will be colliding with the ground)
@@ -196,7 +206,7 @@ class barrel(pygame.sprite.Sprite):
         if self.gravity == True:
             self.changespeed(0,2)
     
-    def movement(self):
+    def movementy(self):
         # Move the player up/down
         self.rect.y += self.change_y
         # Did we hit a wall while moving up/down
@@ -210,11 +220,37 @@ class barrel(pygame.sprite.Sprite):
             else:
                 self.rect.top = wall.rect.bottom
 
-    # Change the x and y speed of the player
-    def changespeed(self, x, y):
-        self.change_x += x
-        self.change_y += y
+    def movementx(self):
+        # Move the player left/right
+        self.rect.x += self.change_x
 
+        # Chooses whether the barrel goes left or right when it gets to the ground
+        if ((self.goright == False) and (self.goleft == False)):
+            # A random number is generated - if the number is 0, go left, if the number is 1, go right
+            leftorright = random.randint(0,1)
+            if (leftorright == 0):
+                self.goleft = True
+            else:
+                self.goright = True
+            print(leftorright)
+            print(self.goleft)
+            print(self.goright)
+
+        if (self.goleft == True):
+            self.changespeed(-5, 0)
+
+        if self.goright == True:
+            self.changespeed(5, 0)
+
+        # Did we HIT A WALL while moving left/right
+        wall_hit_group = pygame.sprite.spritecollide(self, game.allwall_group, False)
+        for wall in wall_hit_group:
+            # If we are moving right, set our right side to the left side of the wall we hit
+            if self.change_x > 0:
+                self.rect.right = wall.rect.left
+            else:
+                # Otherwise if we are moving left, do the opposite
+                self.rect.left = wall.rect.right
 
 # Game class
 class Game(object):
