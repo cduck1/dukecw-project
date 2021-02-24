@@ -75,6 +75,7 @@ class player(pygame.sprite.Sprite):
         self.change_x = 0
         self.change_y = 0
         print(game.gravity)
+
     # Change the x and y speed of the player
     def changespeed(self, x, y):
         self.change_x += x
@@ -115,6 +116,8 @@ class player(pygame.sprite.Sprite):
         # Did we hit a WALL while moving up/down
         wall_hit_group = pygame.sprite.spritecollide(self, game.allwall_group, False)
         for wall in wall_hit_group:
+            # This game.gravity ensures that there is no gravity acting on the player while the player is touching the ground (not side walls, only ground walls) - this is done because I think it will likely make the game run faster
+            game.gravity = False
             # Because we are touching the floor, we reset the ability to jump - you cant jump while on ladders
             self.isJump = False
             # Reset our position based on the top/bottom of the object.
