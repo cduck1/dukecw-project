@@ -188,8 +188,8 @@ class barrel(pygame.sprite.Sprite):
 
     def update(self):
         self.barrelgravity()
-        self.movementy()
         self.movementx()
+        self.movementy()
 
         # Resets the speed change to 0 every update so that the speed doesn't accelerate infinitely
         self.change_x = 0
@@ -207,8 +207,6 @@ class barrel(pygame.sprite.Sprite):
             self.changespeed(0,2)
     
     def movementy(self):
-        # Move the player up/down
-        self.rect.y += self.change_y
         # Did we hit a wall while moving up/down
         wall_hit_group = pygame.sprite.spritecollide(self, game.allwall_group, False)
         for wall in wall_hit_group:
@@ -220,9 +218,10 @@ class barrel(pygame.sprite.Sprite):
             else:
                 self.rect.top = wall.rect.bottom
 
+        # Move the player up/down
+        self.rect.y += self.change_y
+
     def movementx(self):
-        # Move the player left/right
-        self.rect.x += self.change_x
 
         # Chooses whether the barrel goes left or right when it gets to the ground
         if ((self.goright == False) and (self.goleft == False)):
@@ -232,25 +231,30 @@ class barrel(pygame.sprite.Sprite):
                 self.goleft = True
             else:
                 self.goright = True
-            print(leftorright)
-            print(self.goleft)
-            print(self.goright)
 
-        if (self.goleft == True):
-            self.changespeed(-5, 0)
-
-        if self.goright == True:
-            self.changespeed(5, 0)
+        
 
         # Did we HIT A WALL while moving left/right
         wall_hit_group = pygame.sprite.spritecollide(self, game.allwall_group, False)
         for wall in wall_hit_group:
+            # If goleft = True, go left
+            if self.goleft == True:
+                self.changespeed(-5,0)
+
+            # If goright = True, go right
+            if self.goright == True:
+                self.changespeed(5, 0)
+
+
             # If we are moving right, set our right side to the left side of the wall we hit
             if self.change_x > 0:
                 self.rect.right = wall.rect.left
             else:
                 # Otherwise if we are moving left, do the opposite
                 self.rect.left = wall.rect.right
+
+        # Move the player left/right
+        self.rect.x += self.change_x
 
 # Game class
 class Game(object):
@@ -287,7 +291,7 @@ class Game(object):
                         1,0,0,0,0,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,2,2,2,2,2,4,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-                        1,0,0,0,2,2,2,2,2,4,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,2,2,4,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,2,2,4,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,2,2,4,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,2,2,4,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,1,
@@ -376,7 +380,7 @@ class Game(object):
                 self.all_sprites_group.add(self.myDoor)
             # 6s in the array represent barrels
             if self.level1[i] == 6:
-                self.myBarrel = barrel(ORANGE, 40, 40, temp_x, temp_y)
+                self.myBarrel = barrel(ORANGE, 20, 20, temp_x, temp_y)
                 # Add the barrel to a barrel group and an all sprites group
                 self.barrel_group.add(self.myBarrel)
                 self.all_sprites_group.add(self.myBarrel)
