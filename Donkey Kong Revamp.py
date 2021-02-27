@@ -222,7 +222,6 @@ class barrel(pygame.sprite.Sprite):
         self.rect.y += self.change_y
 
     def movementx(self):
-
         # Chooses whether the barrel goes left or right when it gets to the ground
         if ((self.goright == False) and (self.goleft == False)):
             # A random number is generated - if the number is 0, go left, if the number is 1, go right
@@ -231,8 +230,6 @@ class barrel(pygame.sprite.Sprite):
                 self.goleft = True
             else:
                 self.goright = True
-
-        
 
         # Did we HIT A WALL while moving left/right
         wall_hit_group = pygame.sprite.spritecollide(self, game.allwall_group, False)
@@ -243,8 +240,7 @@ class barrel(pygame.sprite.Sprite):
 
             # If goright = True, go right
             if self.goright == True:
-                self.changespeed(5, 0)
-
+                self.changespeed(5,0)
 
             # If we are moving right, set our right side to the left side of the wall we hit
             if self.change_x > 0:
