@@ -89,7 +89,7 @@ class player(pygame.sprite.Sprite):
             if keys[pygame.K_SPACE]: # and if space is pressed
                 self.isJump = True
                 for x in range (0,30):
-                    self.changespeed(0,-1) # Go up 1 pixel 30 times - gives a smoother jump motion and gravity brings the player back down
+                    self.changespeed(0,-1) # Go up 1 pixel 30 times - gives a smoother jump motion and gravity brings the player back down - i think this is not correct
 
     def gravityon(self):
         # GRAVITY - if the player is not colliding with anything, aka he is in the open space, make him fall to the ground (at which point he will be colliding with the ground)
@@ -185,6 +185,8 @@ class barrel(pygame.sprite.Sprite):
         self.gravity = True
         self.goleft = False
         self.goright = False
+        self.movex = False # the default value for allowing the barrel to move left or right is false - this is changed to true when the barrel touches the floor
+        self.midairchoose = True # The barrel spawns in mid air
 
     def update(self):
         self.barrelgravity()
@@ -220,27 +222,13 @@ class barrel(pygame.sprite.Sprite):
         self.rect.y += self.change_y
 
     def movementx(self):
-        # Chooses whether the barrel goes left or right when it gets to the ground
-        if ((self.goright == False) and (self.goleft == False)):
-            # A random number is generated - if the number is 0, go left, if the number is 1, go right
-            leftorright = random.randint(0,1)
-            if (leftorright == 0):
-                self.goleft = True
-            else:
-                self.goright = True
-
         # Did we HIT A WALL while moving left/right
         wall_hit_group = pygame.sprite.spritecollide(self, game.allwall_group, False)
         for wall in wall_hit_group:
-            # If goleft = True, go left
-            if self.goleft == True:
-                self.changespeed(-5, 0)
-                print("LEFT")
-
-            # If goright = True, go right
-            if self.goright == True:
-                self.changespeed(5, 0)
-                print("right")
+            # if we are not in midair, we dont choose a number
+            self.midairchoose = False
+            # If we are touching the floor, we can move left/right
+            self.movex = True
 
             # If we are moving right, set our right side to the left side of the wall we hit
             if self.change_x > 0:
@@ -249,9 +237,31 @@ class barrel(pygame.sprite.Sprite):
                 # Otherwise if we are moving left, do the opposite
                 self.rect.left = wall.rect.right
 
+        # If the barrel is in mid air we choose whether the barrel goes left or right - it actually going left or right is only acted upon once it hits the ground (once movex = True)
+        if (self.midairchoose == True):
+            print("choosing number")
+            # A random number is generated - if the number is 0, go left, if the number is 1, go right
+            leftorright = random.randint(0,1)
+            if (leftorright == 0):
+                self.goleft = True
+            else:
+                self.goright = True
+            self.midairchoose = False
+
+        if self.movex == True:
+            # If goleft = True, go left        
+            if self.goleft == True:
+                self.changespeed(-1, 0)
+
+            # If goright = True, go right
+            if self.goright == True:
+                self.changespeed(1, 0)
+
         # Move the player left/right
         self.rect.x += self.change_x
-
+        # Reset the barrel's ability to move left or right to false every update function so that if in mid air, the barrel cannot move left or right
+        self.movex = False
+        self.midairchoose = True # this is not the best way of doing it as it means the left/right is chosen multiple times while in mid air 
 # Game class
 class Game(object):
     def __init__(self):
