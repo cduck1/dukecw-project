@@ -239,13 +239,16 @@ class barrel(pygame.sprite.Sprite):
 
         # If the barrel is in mid air we choose whether the barrel goes left or right - it actually going left or right is only acted upon once it hits the ground (once movex = True)
         if (self.midairchoose == True):
-            print("choosing number")
             # A random number is generated - if the number is 0, go left, if the number is 1, go right
             leftorright = random.randint(0,1)
             if (leftorright == 0):
                 self.goleft = True
             else:
+                self.goleft = False
+            if (leftorright == 1):
                 self.goright = True
+            else:
+                self.goright = False
             self.midairchoose = False
 
         if self.movex == True:
@@ -261,7 +264,6 @@ class barrel(pygame.sprite.Sprite):
         self.rect.x += self.change_x
         # Reset the barrel's ability to move left or right to false every update function so that if in mid air, the barrel cannot move left or right
         self.movex = False
-        self.midairchoose = True # this is not the best way of doing it as it means the left/right is chosen multiple times while in mid air 
         self.gravity = True
 # Game class
 class Game(object):
