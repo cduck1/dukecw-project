@@ -195,7 +195,7 @@ class barrel(pygame.sprite.Sprite):
         self.change_x = 0
         self.change_y = 0
 
-    # Change the x and y speed of the player
+    # Change the x and y speed of the barrel
     def changespeed(self, x, y):
         self.change_x += x
         self.change_y += y
@@ -215,8 +215,6 @@ class barrel(pygame.sprite.Sprite):
             # Ensures the barrel doesn't fall through the wall
             if self.change_y > 0:
                 self.rect.bottom = wall.rect.top
-            else:
-                self.rect.top = wall.rect.bottom
 
         # Move the player up/down
         self.rect.y += self.change_y
@@ -236,11 +234,13 @@ class barrel(pygame.sprite.Sprite):
         for wall in wall_hit_group:
             # If goleft = True, go left
             if self.goleft == True:
-                self.changespeed(-5,0)
+                self.changespeed(-5, 0)
+                print("LEFT")
 
             # If goright = True, go right
             if self.goright == True:
-                self.changespeed(5,0)
+                self.changespeed(5, 0)
+                print("right")
 
             # If we are moving right, set our right side to the left side of the wall we hit
             if self.change_x > 0:
