@@ -262,6 +262,7 @@ class barrel(pygame.sprite.Sprite):
         # Reset the barrel's ability to move left or right to false every update function so that if in mid air, the barrel cannot move left or right
         self.movex = False
         self.midairchoose = True # this is not the best way of doing it as it means the left/right is chosen multiple times while in mid air 
+        self.gravity = True
 # Game class
 class Game(object):
     def __init__(self):
