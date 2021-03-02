@@ -241,18 +241,17 @@ class barrel(pygame.sprite.Sprite):
         if (self.midairchoose == True):
             # A random number is generated - if the number is 0, go left, if the number is 1, go right
             leftorright = random.randint(0,1)
+            print(leftorright)
             if (leftorright == 0):
                 self.goleft = True
-            else:
-                self.goleft = False
+                self.goright = False
             if (leftorright == 1):
                 self.goright = True
-            else:
-                self.goright = False
+                self.goleft = False
             self.midairchoose = False
 
         if self.movex == True:
-            # If goleft = True, go left        
+            # If goleft = True, go left
             if self.goleft == True:
                 self.changespeed(-1, 0)
 
@@ -262,9 +261,11 @@ class barrel(pygame.sprite.Sprite):
 
         # Move the player left/right
         self.rect.x += self.change_x
+
         # Reset the barrel's ability to move left or right to false every update function so that if in mid air, the barrel cannot move left or right
         self.movex = False
         self.gravity = True
+
 # Game class
 class Game(object):
     def __init__(self):
@@ -360,7 +361,21 @@ class Game(object):
             elif i % 48 == 0:
                 temp_x = 0
                 temp_y = temp_y + 40
-                # 1s in the array represent outer walls
+            # 3s in the array represent the starting position of the player
+            if self.level1[i] == 3:
+                # Instantiate the player class - colour, width, height, x, y, speed
+                # I need to make the player a better size so that its easier to go up ladders - but also need him to start on the floor
+                self.myPlayer = player(BLUE, 40, 40, 20, 20, temp_x, temp_y)
+                # Add the player to a player group and an all sprites group
+                self.player_group.add(self.myPlayer)
+                self.all_sprites_group.add(self.myPlayer)
+            # 6s in the array represent barrels
+            if self.level1[i] == 6:
+                self.myBarrel = barrel(ORANGE, 20, 20, temp_x, temp_y)
+                # Add the barrel to a barrel group and an all sprites group
+                self.barrel_group.add(self.myBarrel)
+                self.all_sprites_group.add(self.myBarrel)
+            # 1s in the array represent outer walls
             if self.level1[i] == 1:
                 self.myOuterWall = outerwall(RED, 40, 40, temp_x, temp_y)
                 self.outerwall_group.add(self.myOuterWall)
@@ -387,21 +402,7 @@ class Game(object):
                 # Add the door to a door group and an all sprites group
                 self.door_group.add(self.myDoor)
                 self.all_sprites_group.add(self.myDoor)
-            # 6s in the array represent barrels
-            if self.level1[i] == 6:
-                self.myBarrel = barrel(ORANGE, 20, 20, temp_x, temp_y)
-                # Add the barrel to a barrel group and an all sprites group
-                self.barrel_group.add(self.myBarrel)
-                self.all_sprites_group.add(self.myBarrel)
 
-            # 3s in the array represent the starting position of the player
-            if self.level1[i] == 3:
-                # Instantiate the player class - colour, width, height, x, y, speed
-                # I need to make the player a better size so that its easier to go up ladders - but also need him to start on the floor
-                self.myPlayer = player(BLUE, 40, 40, 20, 20, temp_x, temp_y)
-                # Add the player to a player group and an all sprites group
-                self.player_group.add(self.myPlayer)
-                self.all_sprites_group.add(self.myPlayer)
 
 
 
