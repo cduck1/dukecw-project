@@ -143,6 +143,9 @@ class outerwall(pygame.sprite.Sprite):
 class innerwall(outerwall):
     pass
 
+class barreldeathwall(outerwall):
+    pass
+
 # Ladder class - when player collides with this he should be able to move up and down it - this is how he gets to the next construction piece/ layer
 class ladder(pygame.sprite.Sprite):
     # Define the constructor for the wall class
@@ -192,6 +195,7 @@ class barrel(pygame.sprite.Sprite):
         self.barrelgravity()
         self.movementx()
         self.movementy()
+        self.die()
 
         # Resets the speed change to 0 every update so that the speed doesn't accelerate infinitely
         self.change_x = 0
@@ -259,6 +263,10 @@ class barrel(pygame.sprite.Sprite):
 
         # Move the player up/down
         self.rect.y += self.change_y
+    
+    def die(self):
+        if pygame.sprite.spritecollide(self,game.myBarreldeathwall_group, False):
+            self.kill()
 
 
 # Game class
@@ -272,6 +280,7 @@ class Game(object):
         self.ladder_group = pygame.sprite.Group()
         self.door_group = pygame.sprite.Group()
         self.barrel_group = pygame.sprite.Group()
+        self.myBarreldeathwall_group = pygame.sprite.Group()
         # This is a group for object that are part of the map (ladders and all walls) - used in the jumping mechanics and drawing order
         self.background_group = pygame.sprite.Group()
         # This is a group for sprites that move - used in the drawing order - this gets drawn after the background_group does
@@ -316,7 +325,7 @@ class Game(object):
                         1,0,0,0,2,2,2,2,2,2,2,2,2,4,4,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,2,2,4,2,2,2,2,2,2,0,0,0,0,0,0,0,1,
                         1,0,0,0,2,2,2,2,2,2,2,2,2,4,4,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,2,2,4,2,2,2,2,2,2,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,0,0,0,0,0,0,0,0,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-                        1,0,3,0,0,0,0,0,0,0,0,0,0,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        7,0,3,0,0,0,0,0,0,0,0,0,0,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
                         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
         # Calls the method levelsetup() so to build the map - this is still in the __init__() function
         self.levelsetup()
@@ -403,6 +412,12 @@ class Game(object):
                 self.barrel_group.add(self.myBarrel)
                 self.moving_sprites_group.add(self.myBarrel)
                 self.all_sprites_group.add(self.myBarrel)
+            # 7s in the array represent barrel death walls - if the barrel hits this wall, it dies (is deleted)
+            if self.level1[i] == 7:
+                self.myBarreldeathwall = barreldeathwall(RED,40,40,temp_x,temp_y)
+                self.myBarreldeathwall_group.add(self.myBarreldeathwall)
+                self.background_group.add(self.myBarreldeathwall)
+                self.all_sprites_group.add(self.myBarreldeathwall)
 
 # STAYS OUTSIDE OF ANY CLASS
 game = Game()
