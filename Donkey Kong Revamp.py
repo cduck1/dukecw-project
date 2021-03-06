@@ -277,8 +277,10 @@ class Game(object):
         self.ladder_group = pygame.sprite.Group()
         self.door_group = pygame.sprite.Group()
         self.barrel_group = pygame.sprite.Group()
-        self.map_group = pygame.sprite.Group() # This is a group for object that are part of the map (ladders and all walls) - used in the jumping mechanics
-        
+        # This is a group for object that are part of the map (ladders and all walls) - used in the jumping mechanics and drawing order
+        self.background_group = pygame.sprite.Group()
+        # This is a group for sprites that move - used in the drawing order - this gets drawn after the background_group does
+        self.moving_sprites_group = pygame.sprite.Group()
         # Create a group of all sprites together
         self.all_sprites_group = pygame.sprite.Group()
 
@@ -332,8 +334,9 @@ class Game(object):
         # Making the screen background black
         screen.fill(BLACK)
 
-        # Draws all the sprites
-        self.all_sprites_group.draw(screen)
+        # Draws the sprites
+        self.background_group.draw(screen)
+        self.moving_sprites_group.draw(screen)
 
         # Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
@@ -361,51 +364,50 @@ class Game(object):
             elif i % 48 == 0:
                 temp_x = 0
                 temp_y = temp_y + 40
-            # 3s in the array represent the starting position of the player
-            if self.level1[i] == 3:
-                # Instantiate the player class - colour, width, height, x, y, speed
-                # I need to make the player a better size so that its easier to go up ladders - but also need him to start on the floor
-                self.myPlayer = player(BLUE, 40, 40, 20, 20, temp_x, temp_y)
-                # Add the player to a player group and an all sprites group
-                self.player_group.add(self.myPlayer)
-                self.all_sprites_group.add(self.myPlayer)
-            # 6s in the array represent barrels
-            if self.level1[i] == 6:
-                self.myBarrel = barrel(ORANGE, 20, 20, temp_x, temp_y)
-                # Add the barrel to a barrel group and an all sprites group
-                self.barrel_group.add(self.myBarrel)
-                self.all_sprites_group.add(self.myBarrel)
             # 1s in the array represent outer walls
             if self.level1[i] == 1:
                 self.myOuterWall = outerwall(RED, 40, 40, temp_x, temp_y)
                 self.outerwall_group.add(self.myOuterWall)
                 self.allwall_group.add(self.myOuterWall)
-                self.map_group.add(self.myOuterWall)
+                self.background_group.add(self.myOuterWall)
                 self.all_sprites_group.add(self.myOuterWall)
             # 2s in the array represent inner walls
             if self.level1[i] == 2:
                 self.myInnerWall = innerwall(RED, 40, 40, temp_x, temp_y)
                 self.innerwall_group.add(self.myInnerWall)
                 self.allwall_group.add(self.myInnerWall)
-                self.map_group.add(self.myInnerWall)
+                self.background_group.add(self.myInnerWall)
                 self.all_sprites_group.add(self.myInnerWall)
+            # 3s in the array represent the starting position of the player
+            if self.level1[i] == 3:
+                # Instantiate the player class - colour, width, height, x, y, speed
+                # I need to make the player a better size so that its easier to go up ladders - but also need him to start on the floor
+                self.myPlayer = player(BLUE, 40, 40, 20, 20, temp_x, temp_y)
+                # Add the player to a player group and an all sprites group and a moving sprites group
+                self.player_group.add(self.myPlayer)
+                self.moving_sprites_group.add(self.myPlayer)
+                self.all_sprites_group.add(self.myPlayer)
             # 4s in the array represent the ladders
             if self.level1[i] == 4:
                 self.myLadder = ladder(YELLOW, 40, 40,temp_x, temp_y-1) # The reason for the temp_y-1 is so that when the player moves across the top of a ladder, then dont start moving down and then get stuck and gravity is off the whole way across with it like this
                 # Add the ladder to a ladder group, map group and an all sprites group
                 self.ladder_group.add(self.myLadder)
-                self.map_group.add(self.myInnerWall)
+                self.background_group.add(self.myLadder)
                 self.all_sprites_group.add(self.myLadder)
             # 5s in the array represent doors
             if self.level1[i] == 5:
                 self.myDoor = door(PURPLE, 40, 40, temp_x, temp_y)
                 # Add the door to a door group and an all sprites group
                 self.door_group.add(self.myDoor)
+                self.background_group.add(self.myDoor)
                 self.all_sprites_group.add(self.myDoor)
-
-
-
-
+            # 6s in the array represent barrels
+            if self.level1[i] == 6:
+                self.myBarrel = barrel(ORANGE, 20, 20, temp_x, temp_y)
+                # Add the barrel to a barrel group and an all sprites group
+                self.barrel_group.add(self.myBarrel)
+                self.moving_sprites_group.add(self.myBarrel)
+                self.all_sprites_group.add(self.myBarrel)
 
 # STAYS OUTSIDE OF ANY CLASS
 game = Game()
