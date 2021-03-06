@@ -1,5 +1,6 @@
 import pygame
 import random
+import time
 
 # Defining colours
 BLACK = (0,0,0)
@@ -407,11 +408,15 @@ class Game(object):
                 self.all_sprites_group.add(self.myDoor)
             # 6s in the array represent barrels
             if self.level1[i] == 6:
-                self.myBarrel = barrel(ORANGE, 20, 20, temp_x, temp_y)
-                # Add the barrel to a barrel group and an all sprites group
-                self.barrel_group.add(self.myBarrel)
-                self.moving_sprites_group.add(self.myBarrel)
-                self.all_sprites_group.add(self.myBarrel)
+                start = pygame.time.get_ticks()
+                now = pygame.time.get_ticks()
+                if now - start > 10:
+                    start = now
+                    self.myBarrel = barrel(ORANGE, 20, 20, temp_x, temp_y)
+                    # Add the barrel to a barrel group and an all sprites group
+                    self.barrel_group.add(self.myBarrel)
+                    self.moving_sprites_group.add(self.myBarrel)
+                    self.all_sprites_group.add(self.myBarrel)
             # 7s in the array represent barrel death walls - if the barrel hits this wall, it dies (is deleted)
             if self.level1[i] == 7:
                 self.myBarreldeathwall = barreldeathwall(RED,40,40,temp_x,temp_y)
