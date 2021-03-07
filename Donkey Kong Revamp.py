@@ -226,7 +226,6 @@ class barrel(pygame.sprite.Sprite):
         if (self.midairchoose == True):
             # A random number is generated - if the number is 0, go left, if the number is 1, go right
             leftorright = random.randint(0,1)
-            print(leftorright)
             if (leftorright == 0):
                 self.goleft = True
                 self.goright = False
@@ -269,7 +268,6 @@ class barrel(pygame.sprite.Sprite):
         if pygame.sprite.spritecollide(self,game.myBarreldeathwall_group, False):
             self.kill()
 
-
 # Game class
 class Game(object):
     def __init__(self):
@@ -289,8 +287,16 @@ class Game(object):
         # Create a group of all sprites together
         self.all_sprites_group = pygame.sprite.Group()
 
+        # Barrel spawning variables
+        # These are temporarily 0 and will be overwritten almost instantely (as soon as the level is setup)
+        self.barrelspawncoordx = 0
+        self.barrelspawncoordy = 0
+        # This is the start timer which allows the barrel to spawn every 3 seconds
+        self.start = pygame.time.get_ticks()
+
         # Setting the gameRunning flag to false - when the game is exited, the eventprocess() method returns True, making done = True, which exits the game
         self.gameRunning = True
+
 
         # CREATING THE LAYOUT OF THE GAME USING A LIST 
         # Plan for creating the walls: have a list of 1200 items, create wall at a specific x and y coordinates if there is a 1; once you get to the 48th element (to the end of the screen), go you down 40 pixels and start at x coord 0
@@ -299,17 +305,13 @@ class Game(object):
         # There are 1200 total elements because each element represent a block of 48 by 40 and 48 x 40 = 1200
         # Top and bottom walls (48 1s) = 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
         # Side walls = 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-        # 0 = nothing present
-        # 1 = outer wall present
-        # 2 = inner wall present
-        # 3 = player start point
         self.level1 =  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-                        1,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-                        1,0,0,0,0,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-                        1,0,0,0,0,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-                        1,0,0,0,2,2,2,2,2,4,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-                        1,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-                        1,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,0,0,0,0,0,0,0,2,2,2,4,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,2,2,2,2,2,4,2,0,0,0,0,2,4,2,2,2,2,2,2,2,2,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,2,2,4,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,2,2,4,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,2,2,4,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,2,2,4,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
@@ -331,8 +333,22 @@ class Game(object):
         # Calls the method levelsetup() so to build the map - this is still in the __init__() function
         self.levelsetup()
 
+    def update(self):
+        self.spawnbarrels()
+
+    def spawnbarrels(self):
+        now = pygame.time.get_ticks()
+        if now - self.start > 3000: # 3000 milliseconds is 3 seconds
+            self.myBarrel = barrel(ORANGE, 20, 20, self.barrelspawncoordx, self.barrelspawncoordy)
+            # Add the barrel to a barrel group and an all sprites group
+            self.barrel_group.add(self.myBarrel)
+            self.moving_sprites_group.add(self.myBarrel)
+            self.all_sprites_group.add(self.myBarrel)
+            self.start = now
+
     # Method where all the game logic goes
     def runlogic(self):
+        self.update() # This ensures the update function of the game class runs
         self.all_sprites_group.update()
 
     def display(self,screen):
@@ -408,19 +424,19 @@ class Game(object):
                 self.all_sprites_group.add(self.myDoor)
             # 6s in the array represent barrels
             if self.level1[i] == 6:
-                start = pygame.time.get_ticks()
-                now = pygame.time.get_ticks()
-                if now - start > 10:
-                    start = now
-                    self.myBarrel = barrel(ORANGE, 20, 20, temp_x, temp_y)
-                    # Add the barrel to a barrel group and an all sprites group
-                    self.barrel_group.add(self.myBarrel)
-                    self.moving_sprites_group.add(self.myBarrel)
-                    self.all_sprites_group.add(self.myBarrel)
+                self.myBarrel = barrel(ORANGE, 20, 20, temp_x, temp_y)
+                # Add the barrel to a barrel group and an all sprites group
+                self.barrel_group.add(self.myBarrel)
+                self.moving_sprites_group.add(self.myBarrel)
+                self.all_sprites_group.add(self.myBarrel)
+                # Have two variables that determine where the "6" is in the map, so we can spawn more barrels there every 3 seconds
+                self.barrelspawncoordx = temp_x
+                self.barrelspawncoordy = temp_y
             # 7s in the array represent barrel death walls - if the barrel hits this wall, it dies (is deleted)
             if self.level1[i] == 7:
                 self.myBarreldeathwall = barreldeathwall(RED,40,40,temp_x,temp_y)
                 self.myBarreldeathwall_group.add(self.myBarreldeathwall)
+                self.allwall_group.add(self.myBarreldeathwall)
                 self.background_group.add(self.myBarreldeathwall)
                 self.all_sprites_group.add(self.myBarreldeathwall)
 
