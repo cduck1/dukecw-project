@@ -43,11 +43,12 @@ class player(pygame.sprite.Sprite):
         # Set a speed vector
         self.change_x = 0
         self.change_y = 0
-        # Variables
+        # Flags
         self.isJump = False
         self.gravity = True
+        # Variables
+        self.lives = 3
 
-        
     def update(self):
         # PLAYER MOVEMENT
         keys = pygame.key.get_pressed()
@@ -73,6 +74,8 @@ class player(pygame.sprite.Sprite):
         self.gravityon()
         self.movehorizontal()
         self.movevertical()
+        self.barrelhit()
+        self.portalhit()
 
         # Resets the speed change to 0 every update so that the speed doesn't accelerate infinitely
         self.change_x = 0
@@ -128,6 +131,18 @@ class player(pygame.sprite.Sprite):
             else:
                 self.rect.top = wall.rect.bottom
 
+    def barrelhit(self):
+        if pygame.sprite.spritecollide(self, game.barrel_group, True):
+            self.lives -= 1
+            print("Lives: ", int(self.lives))
+
+    # When we hit a new portal we move to the next level
+    def portalhit(self):
+        if pygame.sprite.spritecollide(self, game.portal_group, False):
+            game.level += 1
+            game.clearlevel()
+            game.levelsetup()
+
 # Outerwall class
 class outerwall(pygame.sprite.Sprite):
     # Define the constructor for the wall class
@@ -159,8 +174,8 @@ class ladder(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
-# Door class - takes you to the next level
-class door(pygame.sprite.Sprite):
+# portal class - takes you to the next level
+class portal(pygame.sprite.Sprite):
     # Define the constructor for the wall class
     def __init__(self, color, width, height, x, y):
         super().__init__()
@@ -277,7 +292,7 @@ class Game(object):
         self.outerwall_group = pygame.sprite.Group()
         self.innerwall_group = pygame.sprite.Group()
         self.ladder_group = pygame.sprite.Group()
-        self.door_group = pygame.sprite.Group()
+        self.portal_group = pygame.sprite.Group()
         self.barrel_group = pygame.sprite.Group()
         self.myBarreldeathwall_group = pygame.sprite.Group()
         # This is a group for object that are part of the map (ladders and all walls) - used in the jumping mechanics and drawing order
@@ -293,6 +308,9 @@ class Game(object):
         self.barrelspawncoordy = 0
         # This is the start timer which allows the barrel to spawn every 3 seconds
         self.start = pygame.time.get_ticks()
+
+        # Variables
+        self.level = 1
 
         # Setting the gameRunning flag to false - when the game is exited, the eventprocess() method returns True, making done = True, which exits the game
         self.gameRunning = True
@@ -362,7 +380,7 @@ class Game(object):
         # Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
 
-    # Method which closes the game 
+    # Method which closes the game
     def eventprocess(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -415,13 +433,13 @@ class Game(object):
                 self.ladder_group.add(self.myLadder)
                 self.background_group.add(self.myLadder)
                 self.all_sprites_group.add(self.myLadder)
-            # 5s in the array represent doors
+            # 5s in the array represent portals
             if self.level1[i] == 5:
-                self.myDoor = door(PURPLE, 40, 40, temp_x, temp_y)
-                # Add the door to a door group and an all sprites group
-                self.door_group.add(self.myDoor)
-                self.background_group.add(self.myDoor)
-                self.all_sprites_group.add(self.myDoor)
+                self.myPortal = portal(PURPLE, 40, 40, temp_x, temp_y)
+                # Add the portal to a portal group and an all sprites group
+                self.portal_group.add(self.myPortal)
+                self.background_group.add(self.myPortal)
+                self.all_sprites_group.add(self.myPortal)
             # 6s in the array represent barrels
             if self.level1[i] == 6:
                 self.myBarrel = barrel(ORANGE, 20, 20, temp_x, temp_y)
@@ -439,6 +457,15 @@ class Game(object):
                 self.allwall_group.add(self.myBarreldeathwall)
                 self.background_group.add(self.myBarreldeathwall)
                 self.all_sprites_group.add(self.myBarreldeathwall)
+
+        # Print stuff - this goes at the bottom of this because the player must be created to have player.lives
+        print("Level: ", int(self.level))
+        
+    # Allows us to move on to the next level by clearing the current level first
+    def clearlevel(self):
+        # This get's rid of the current level's sprites
+        for sprite in game.all_sprites_group:
+            sprite.kill()       
 
 # STAYS OUTSIDE OF ANY CLASS
 game = Game()
