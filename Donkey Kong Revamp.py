@@ -12,6 +12,7 @@ YELLOW = (255,255,0)
 PINK = (255,20,147)
 PURPLE = (138,43,226)
 ORANGE = (255,165,0)
+GOLD = (255,215,0)
 
 pygame.init()
 
@@ -74,6 +75,7 @@ class player(pygame.sprite.Sprite):
         self.movehorizontal()
         self.movevertical()
         self.barrelhit()
+        self.coinhit()
         self.portalhit()
 
         # Resets the speed change to 0 every update so that the speed doesn't accelerate infinitely
@@ -134,6 +136,11 @@ class player(pygame.sprite.Sprite):
         if pygame.sprite.spritecollide(self, game.barrel_group, True):
             game.lives -= 1
             print("Lives: ", int(game.lives))
+
+    def coinhit(self):
+        if pygame.sprite.spritecollide(self,game.coin_group, True):
+            game.coins += 1
+            print("Coins: ", int(game.coins))
 
     # When we hit a new portal we move to the next level
     def portalhit(self):
@@ -279,8 +286,20 @@ class barrel(pygame.sprite.Sprite):
         self.rect.y += self.change_y
     
     def die(self):
-        if pygame.sprite.spritecollide(self,game.myBarreldeathwall_group, False):
+        if pygame.sprite.spritecollide(self,game.barreldeathwall_group, False):
             self.kill()
+
+# Coins class
+class coins(pygame.sprite.Sprite):
+    # Define the constructor for the wall class
+    def __init__(self, color, width, height, x, y):
+        super().__init__()
+        # Create a sprite and fill it with a the image
+        self.image = pygame.Surface([width,height])
+        self.image.fill(color)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
 
 # Game class
 class Game(object):
@@ -293,7 +312,8 @@ class Game(object):
         self.ladder_group = pygame.sprite.Group()
         self.portal_group = pygame.sprite.Group()
         self.barrel_group = pygame.sprite.Group()
-        self.myBarreldeathwall_group = pygame.sprite.Group()
+        self.barreldeathwall_group = pygame.sprite.Group()
+        self.coin_group = pygame.sprite.Group()
         # This is a group for object that are part of the map (ladders and all walls) - used in the jumping mechanics and drawing order
         self.background_group = pygame.sprite.Group()
         # This is a group for sprites that move - used in the drawing order - this gets drawn after the background_group does
@@ -311,6 +331,7 @@ class Game(object):
         # Variables
         self.level = 1
         self.lives = 3 # We refer to the game for the lives of the player as this allows the lives to be continued from level to level - the lives do not reset back to 3 every time you go to the next level
+        self.coins = 0
 
         # Setting the gameRunning flag to false - when the game is exited, the eventprocess() method returns True, making done = True, which exits the game
         self.gameRunning = True
@@ -325,7 +346,7 @@ class Game(object):
         self.level1 =  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
                         1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,0,0,0,0,0,0,0,2,2,2,4,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,0,0,0,0,0,0,0,2,2,2,4,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,2,2,2,2,2,4,2,0,0,0,0,2,4,2,2,2,2,2,2,2,2,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
@@ -333,15 +354,15 @@ class Game(object):
                         1,0,0,0,0,2,2,4,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,2,2,4,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-                        1,0,0,0,0,0,0,4,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,4,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,4,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,4,2,0,0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,1,
                         1,0,0,0,0,0,0,4,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,4,2,0,0,0,0,0,0,0,0,0,0,2,4,2,0,0,0,0,1,
-                        1,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,2,4,2,0,0,0,0,1,
+                        1,0,0,0,0,0,0,4,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,2,4,2,0,0,0,0,1,
                         1,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,1,
                         1,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,1,
                         1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,4,2,2,2,2,2,2,2,2,2,2,2,2,2,4,2,2,2,2,2,0,0,0,1,
                         1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,4,2,2,2,2,2,2,2,2,2,2,2,2,2,4,2,2,2,2,2,0,0,0,1,
                         1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,1,
-                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,2,2,2,2,2,2,2,2,2,4,4,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,2,2,4,2,2,2,2,2,2,0,0,0,0,0,0,0,1,
                         1,0,0,0,2,2,2,2,2,2,2,2,2,4,4,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,2,2,4,2,2,2,2,2,2,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,0,0,0,0,0,0,0,0,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
@@ -385,6 +406,10 @@ class Game(object):
         font = pygame.font.Font('freesansbold.ttf', 30)
         text = font.render(("LIVES: " + str(self.lives)), 1, WHITE)
         screen.blit(text, (10, 45))
+        # For player's coins
+        font = pygame.font.Font('freesansbold.ttf', 30)
+        text = font.render(("COINS: " + str(self.coins)), 1, WHITE)
+        screen.blit(text, (10, 80))
 
         # Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
@@ -462,10 +487,16 @@ class Game(object):
             # 7s in the array represent barrel death walls - if the barrel hits this wall, it dies (is deleted)
             if self.level1[i] == 7:
                 self.myBarreldeathwall = barreldeathwall(RED,40,40,temp_x,temp_y)
-                self.myBarreldeathwall_group.add(self.myBarreldeathwall)
+                self.barreldeathwall_group.add(self.myBarreldeathwall)
                 self.allwall_group.add(self.myBarreldeathwall)
                 self.background_group.add(self.myBarreldeathwall)
                 self.all_sprites_group.add(self.myBarreldeathwall)
+            # 8s in the array represent coins
+            if self.level1[i] == 8:
+                self.myCoin = barreldeathwall(GOLD,10,10,temp_x+15,temp_y+25) # The + and - values on the temp_x and temp_y are to centre and ensure the coin is on the ground (actually slightly off the ground because this makes it look cooler)
+                self.coin_group.add(self.myCoin)
+                self.background_group.add(self.myCoin)
+                self.all_sprites_group.add(self.myCoin)
 
         # Print stuff - this goes at the bottom of this because the player must be created to have myPlayer.lives
         print("Level: ", int(self.level))
