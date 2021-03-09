@@ -13,6 +13,7 @@ PINK = (255,20,147)
 PURPLE = (138,43,226)
 ORANGE = (255,165,0)
 GOLD = (255,215,0)
+BROWN = (165,42,42)
 
 pygame.init()
 
@@ -146,6 +147,7 @@ class player(pygame.sprite.Sprite):
     def portalhit(self):
         if pygame.sprite.spritecollide(self, game.portal_group, False):
             game.level += 1
+            game.coins += 2 # You gain 2 coins when you finish each level
             game.clearlevel() # Clear the level
             game.levelsetup() # And set the level up again
 
@@ -377,7 +379,7 @@ class Game(object):
     def spawnbarrels(self):
         now = pygame.time.get_ticks()
         if now - self.start > 3000: # 3000 milliseconds is 3 seconds
-            self.myBarrel = barrel(ORANGE, 20, 20, self.barrelspawncoordx, self.barrelspawncoordy)
+            self.myBarrel = barrel(BROWN, 20, 20, self.barrelspawncoordx, self.barrelspawncoordy)
             # Add the barrel to a barrel group and an all sprites group
             self.barrel_group.add(self.myBarrel)
             self.moving_sprites_group.add(self.myBarrel)
@@ -476,7 +478,7 @@ class Game(object):
                 self.all_sprites_group.add(self.myPortal)
             # 6s in the array represent barrels
             if self.level1[i] == 6:
-                self.myBarrel = barrel(ORANGE, 20, 20, temp_x, temp_y)
+                self.myBarrel = barrel(BROWN, 20, 20, temp_x, temp_y)
                 # Add the barrel to a barrel group and an all sprites group
                 self.barrel_group.add(self.myBarrel)
                 self.moving_sprites_group.add(self.myBarrel)
@@ -501,6 +503,7 @@ class Game(object):
         # Print stuff - this goes at the bottom of this because the player must be created to have myPlayer.lives
         print("Level: ", int(self.level))
         print("Lives: ", int(self.lives))
+        print("Coins: ", int(self.coins))
         
     # Allows us to move on to the next level by clearing the current level first
     def clearlevel(self):
