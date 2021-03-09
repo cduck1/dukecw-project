@@ -458,8 +458,9 @@ class Game(object):
                 self.background_group.add(self.myBarreldeathwall)
                 self.all_sprites_group.add(self.myBarreldeathwall)
 
-        # Print stuff - this goes at the bottom of this because the player must be created to have player.lives
+        # Print stuff - this goes at the bottom of this because the player must be created to have myPlayer.lives
         print("Level: ", int(self.level))
+        print("Lives: ", int(self.myPlayer.lives))
         
     # Allows us to move on to the next level by clearing the current level first
     def clearlevel(self):
