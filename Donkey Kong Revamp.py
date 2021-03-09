@@ -47,7 +47,6 @@ class player(pygame.sprite.Sprite):
         self.isJump = False
         self.gravity = True
         # Variables
-        self.lives = 3
 
     def update(self):
         # PLAYER MOVEMENT
@@ -133,15 +132,15 @@ class player(pygame.sprite.Sprite):
 
     def barrelhit(self):
         if pygame.sprite.spritecollide(self, game.barrel_group, True):
-            self.lives -= 1
-            print("Lives: ", int(self.lives))
+            game.lives -= 1
+            print("Lives: ", int(game.lives))
 
     # When we hit a new portal we move to the next level
     def portalhit(self):
         if pygame.sprite.spritecollide(self, game.portal_group, False):
             game.level += 1
-            game.clearlevel()
-            game.levelsetup()
+            game.clearlevel() # Clear the level
+            game.levelsetup() # And set the level up again
 
 # Outerwall class
 class outerwall(pygame.sprite.Sprite):
@@ -311,10 +310,10 @@ class Game(object):
 
         # Variables
         self.level = 1
+        self.lives = 3 # We refer to the game for the lives of the player as this allows the lives to be continued from level to level - the lives do not reset back to 3 every time you go to the next level
 
         # Setting the gameRunning flag to false - when the game is exited, the eventprocess() method returns True, making done = True, which exits the game
         self.gameRunning = True
-
 
         # CREATING THE LAYOUT OF THE GAME USING A LIST 
         # Plan for creating the walls: have a list of 1200 items, create wall at a specific x and y coordinates if there is a 1; once you get to the 48th element (to the end of the screen), go you down 40 pixels and start at x coord 0
@@ -376,6 +375,16 @@ class Game(object):
         # Draws the sprites
         self.background_group.draw(screen)
         self.moving_sprites_group.draw(screen)
+
+        # Draws variables - lives, level
+        # For level number
+        font = pygame.font.Font('freesansbold.ttf', 30)
+        text = font.render(("LEVEL: " + str(self.level)), 1, WHITE)
+        screen.blit(text, (10, 10))
+        # For player's lives
+        font = pygame.font.Font('freesansbold.ttf', 30)
+        text = font.render(("LIVES: " + str(self.lives)), 1, WHITE)
+        screen.blit(text, (10, 45))
 
         # Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
@@ -460,7 +469,7 @@ class Game(object):
 
         # Print stuff - this goes at the bottom of this because the player must be created to have myPlayer.lives
         print("Level: ", int(self.level))
-        print("Lives: ", int(self.myPlayer.lives))
+        print("Lives: ", int(self.lives))
         
     # Allows us to move on to the next level by clearing the current level first
     def clearlevel(self):
