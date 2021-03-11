@@ -370,6 +370,37 @@ class Game(object):
                         1,0,0,0,0,0,0,0,0,0,0,0,0,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
                         7,0,3,0,0,0,0,0,0,0,0,0,0,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
                         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+
+        self.level2 =  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,4,2,2,2,2,2,2,2,4,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,4,2,2,2,2,2,2,2,4,2,2,2,2,2,2,2,4,2,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,2,2,4,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,4,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,4,2,2,0,0,1,
+                        1,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,1,
+                        1,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,4,2,2,2,2,2,4,2,2,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,1,
+                        1,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,1,
+                        1,0,0,0,2,2,2,4,2,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,2,4,2,2,2,0,0,0,1,
+                        1,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,2,2,4,2,2,2,0,0,0,2,2,2,4,2,2,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,2,2,2,2,4,2,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,2,4,2,2,2,2,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,2,2,2,4,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,4,2,2,2,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,2,4,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,4,2,0,0,0,0,0,0,0,0,1,
+                        7,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,7,
+                        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+
+        # This list is used in the nextlevel() method
+        # We have a 0 at index 0 to represent that there is nothing there, this is done because there is no level 0, levels start at 1, so the first map that can be iterated through is at index 1
+        self.alllevels = [0,self.level1,self.level2]
+
         # Calls the method levelsetup() so to build the map - this is still in the __init__() function
         self.levelsetup()
 
@@ -424,6 +455,7 @@ class Game(object):
         return False
         
     def levelsetup(self):
+        self.nextlevel()
         for i in range (0,1200):
             # temp_x and temp_y are the temporary values where the wall will be created for that iteration of the for loop, so if there is a 1 at that position, it will be created at a different x and y each time
             # We have an if i == 0 here because we need the walls to start at zero, if it didnt we would start with temp_x = temp_x + 40 and so fourth
@@ -440,21 +472,21 @@ class Game(object):
                 temp_x = 0
                 temp_y = temp_y + 40
             # 1s in the array represent outer walls
-            if self.level1[i] == 1:
+            if self.levelselected[i] == 1:
                 self.myOuterWall = outerwall(RED, 40, 40, temp_x, temp_y)
                 self.outerwall_group.add(self.myOuterWall)
                 self.allwall_group.add(self.myOuterWall)
                 self.background_group.add(self.myOuterWall)
                 self.all_sprites_group.add(self.myOuterWall)
             # 2s in the array represent inner walls
-            if self.level1[i] == 2:
+            if self.levelselected[i] == 2:
                 self.myInnerWall = innerwall(RED, 40, 40, temp_x, temp_y)
                 self.innerwall_group.add(self.myInnerWall)
                 self.allwall_group.add(self.myInnerWall)
                 self.background_group.add(self.myInnerWall)
                 self.all_sprites_group.add(self.myInnerWall)
             # 3s in the array represent the starting position of the player
-            if self.level1[i] == 3:
+            if self.levelselected[i] == 3:
                 # Instantiate the player class - colour, width, height, x, y, speed
                 # I need to make the player a better size so that its easier to go up ladders - but also need him to start on the floor
                 self.myPlayer = player(BLUE, 40, 40, 20, 20, temp_x, temp_y)
@@ -463,21 +495,21 @@ class Game(object):
                 self.moving_sprites_group.add(self.myPlayer)
                 self.all_sprites_group.add(self.myPlayer)
             # 4s in the array represent the ladders
-            if self.level1[i] == 4:
+            if self.levelselected[i] == 4:
                 self.myLadder = ladder(YELLOW, 40, 40,temp_x, temp_y-1) # The reason for the temp_y-1 is so that when the player moves across the top of a ladder, then dont start moving down and then get stuck and gravity is off the whole way across with it like this
                 # Add the ladder to a ladder group, map group and an all sprites group
                 self.ladder_group.add(self.myLadder)
                 self.background_group.add(self.myLadder)
                 self.all_sprites_group.add(self.myLadder)
             # 5s in the array represent portals
-            if self.level1[i] == 5:
+            if self.levelselected[i] == 5:
                 self.myPortal = portal(PURPLE, 40, 40, temp_x, temp_y)
                 # Add the portal to a portal group and an all sprites group
                 self.portal_group.add(self.myPortal)
                 self.background_group.add(self.myPortal)
                 self.all_sprites_group.add(self.myPortal)
             # 6s in the array represent barrels
-            if self.level1[i] == 6:
+            if self.levelselected[i] == 6:
                 self.myBarrel = barrel(BROWN, 20, 20, temp_x, temp_y)
                 # Add the barrel to a barrel group and an all sprites group
                 self.barrel_group.add(self.myBarrel)
@@ -487,15 +519,15 @@ class Game(object):
                 self.barrelspawncoordx = temp_x
                 self.barrelspawncoordy = temp_y
             # 7s in the array represent barrel death walls - if the barrel hits this wall, it dies (is deleted)
-            if self.level1[i] == 7:
+            if self.levelselected[i] == 7:
                 self.myBarreldeathwall = barreldeathwall(RED,40,40,temp_x,temp_y)
                 self.barreldeathwall_group.add(self.myBarreldeathwall)
                 self.allwall_group.add(self.myBarreldeathwall)
                 self.background_group.add(self.myBarreldeathwall)
                 self.all_sprites_group.add(self.myBarreldeathwall)
             # 8s in the array represent coins
-            if self.level1[i] == 8:
-                self.myCoin = barreldeathwall(GOLD,10,10,temp_x+15,temp_y+25) # The + and - values on the temp_x and temp_y are to centre and ensure the coin is on the ground (actually slightly off the ground because this makes it look cooler)
+            if self.levelselected[i] == 8:
+                self.myCoin = coins(GOLD,10,10,temp_x+15,temp_y+25) # The + and - values on the temp_x and temp_y are to centre and ensure the coin is on the ground (actually slightly off the ground because this makes it look cooler)
                 self.coin_group.add(self.myCoin)
                 self.background_group.add(self.myCoin)
                 self.all_sprites_group.add(self.myCoin)
@@ -509,7 +541,12 @@ class Game(object):
     def clearlevel(self):
         # This get's rid of the current level's sprites
         for sprite in game.all_sprites_group:
-            sprite.kill()       
+            sprite.kill()
+
+    # Chooses which list is iterated through in the levelsetup() method
+    def nextlevel(self):
+        # self.alllevels is a list of maps of levels, self.level is the current level that the player is on - if self.level = 1, then the map chosen would be whatever were at index 1 (map/ level 2)
+        self.levelselected = self.alllevels[self.level]
 
 # STAYS OUTSIDE OF ANY CLASS
 game = Game()
