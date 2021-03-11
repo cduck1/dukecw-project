@@ -372,7 +372,7 @@ class Game(object):
                         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 
         self.level2 =  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
                         1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
@@ -510,7 +510,7 @@ class Game(object):
                 self.all_sprites_group.add(self.myPortal)
             # 6s in the array represent barrels
             if self.levelselected[i] == 6:
-                self.myBarrel = barrel(BROWN, 20, 20, temp_x, temp_y)
+                self.myBarrel = barrel(BROWN, 20, 20, temp_x+10, temp_y+10) # The + values are to centre the barrels within that 40x40 block
                 # Add the barrel to a barrel group and an all sprites group
                 self.barrel_group.add(self.myBarrel)
                 self.moving_sprites_group.add(self.myBarrel)
@@ -527,7 +527,7 @@ class Game(object):
                 self.all_sprites_group.add(self.myBarreldeathwall)
             # 8s in the array represent coins
             if self.levelselected[i] == 8:
-                self.myCoin = coins(GOLD,10,10,temp_x+15,temp_y+25) # The + and - values on the temp_x and temp_y are to centre and ensure the coin is on the ground (actually slightly off the ground because this makes it look cooler)
+                self.myCoin = coins(GOLD,10,10,temp_x+15,temp_y+25) # The + values on the temp_x and temp_y are to centre and ensure the coin is on the ground (actually slightly off the ground because this makes it look cooler)
                 self.coin_group.add(self.myCoin)
                 self.background_group.add(self.myCoin)
                 self.all_sprites_group.add(self.myCoin)
