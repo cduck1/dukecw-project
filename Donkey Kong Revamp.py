@@ -574,8 +574,8 @@ class Game(object):
                 self.moving_sprites_group.add(self.myBarrel)
                 self.all_sprites_group.add(self.myBarrel)
                 # Have two variables that determine where the "6" is in the map, so we can spawn more barrels there every 3 seconds
-                self.barrelspawncoordx = temp_x
-                self.barrelspawncoordy = temp_y
+                self.barrelspawncoordx = temp_x + 10
+                self.barrelspawncoordy = temp_y + 10
             # 7s in the array represent barrel death walls - if the barrel hits this wall, it dies (is deleted)
             if self.levelselected[i] == 7:
                 self.myBarreldeathwall = barreldeathwall(RED,40,40,temp_x,temp_y)
