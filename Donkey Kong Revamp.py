@@ -58,7 +58,7 @@ class player(pygame.sprite.Sprite):
         # Makes it so that player can only go up/down if he is in contact with the ladder and turns gravity off while the player is on the ladder
         if pygame.sprite.groupcollide(game.player_group, game.ladder_group, False, False):
             self.gravity = False # When colliding with the ladder gravity is off
-            self.isJump = True # Make isJump true while colliding with the ladder so that the player cannot just while on the ladder
+            self.isJump = True # Make isJump true while colliding with the ladder so that the player cannot jump while on the ladder
             if keys[pygame.K_UP]:
                 self.changespeed(0, -5)
             if keys[pygame.K_DOWN]:
@@ -72,7 +72,7 @@ class player(pygame.sprite.Sprite):
             self.changespeed(5, 0)
 
         # Made this code functions because it cleans up the previously cluttered update function significantly
-        self.jumping()
+        self.jumpingtrigger()
         self.gravityon()
         self.movehorizontal()
         self.movevertical()
@@ -89,12 +89,22 @@ class player(pygame.sprite.Sprite):
         self.change_x += x
         self.change_y += y
 
-    def jumping(self):
+    def jumpingtrigger(self):
+        nowtime = pygame.time.get_ticks()
         keys = pygame.key.get_pressed()
         # Jumping
         if self.isJump == False: # If mario is not jumping
             if keys[pygame.K_SPACE]: # and if space is pressed
-                self.changespeed(0,-39) # Go up 1 pixel - gives a smoother jump motion and gravity brings the player back down
+                global startjumptime
+                startjumptime = pygame.time.get_ticks()
+                self.changespeed(0,-6)
+                self.isJump = True
+        print(self.isJump)
+        if self.isJump == True:
+            airtime = nowtime - startjumptime
+            if airtime < 180:
+                self.changespeed(0,-6) # Go up 4 pixels each update function (each time jumpingtrigger method is called) - gives a smoother jump motion and gravity brings the player back down. This must be -4 because gravity = +3 every update function so the total movement upwards is 1 pixel a update function
+                nowtime = pygame.time.get_ticks()
 
     def gravityon(self):
         # GRAVITY - if the player is not colliding with anything, aka he is in the open space, make him fall to the ground (at which point he will be colliding with the ground)
