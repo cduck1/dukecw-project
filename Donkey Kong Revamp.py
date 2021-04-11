@@ -14,6 +14,7 @@ PURPLE = (138,43,226)
 ORANGE = (255,165,0)
 GOLD = (255,215,0)
 BROWN = (165,42,42)
+DARKBROWN = (43,29,14)
 
 pygame.init()
 
@@ -49,7 +50,7 @@ class player(pygame.sprite.Sprite):
         self.isJump = False
         self.gravity = True
         # Variables
-        
+    
 
     def update(self):
         # PLAYER MOVEMENT
@@ -72,7 +73,7 @@ class player(pygame.sprite.Sprite):
             self.changespeed(5, 0)
 
         # Made this code functions because it cleans up the previously cluttered update function significantly
-        self.jumpingtrigger()
+        self.jumping()
         self.gravityon()
         self.movehorizontal()
         self.movevertical()
@@ -89,7 +90,7 @@ class player(pygame.sprite.Sprite):
         self.change_x += x
         self.change_y += y
 
-    def jumpingtrigger(self):
+    def jumping(self):
         nowtime = pygame.time.get_ticks()
         keys = pygame.key.get_pressed()
         # Jumping
@@ -160,6 +161,88 @@ class player(pygame.sprite.Sprite):
             game.coins += 2 # You gain 2 coins when you finish each level
             game.clearlevel() # Clear the level
             game.levelsetup() # And set the level up again
+
+# This is the player but in the arena - we have a different class for this player because it allows us to change the players movement along with many other things (e.g: no jumping, and no need for if statement before every difference between the two players checking whether it is level 10 yet or not)
+class arenaplayer(pygame.sprite.Sprite):
+    # Define the constructor for the wall class
+    def __init__(self, color, width, height, x, y):
+        super().__init__()
+        # Create a sprite and fill it with a the image
+        self.image = pygame.Surface([width,height])
+        self.image.fill(color)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        # Set a speed vector
+        self.change_x = 0
+        self.change_y = 0
+
+    def update(self):
+        # ARENA PLAYER MOVEMENT
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            self.changespeed(-5, 0)
+        if keys[pygame.K_RIGHT]:
+            self.changespeed(5, 0)
+        if keys[pygame.K_UP]:
+            self.changespeed(0, -5)
+        if keys[pygame.K_DOWN]:
+            self.changespeed(0, 5)
+
+        # Made this code functions because it cleans up the previously cluttered update function significantly
+        self.movementx()
+        self.movementy()
+        # Resets the speed change to 0 every update so that the speed doesn't accelerate infinitely
+        self.change_x = 0
+        self.change_y = 0
+
+    # Change the x and y speed of the player
+    def changespeed(self, x, y):
+        self.change_x += x
+        self.change_y += y
+
+    def movementx(self):
+        # Move the player left/right
+        self.rect.x += self.change_x
+        # Did we HIT A WALL while moving left/right
+        wall_hit_group = pygame.sprite.spritecollide(self, game.allwall_group, False)
+        for wall in wall_hit_group:
+            # If we are moving right, set our right side to the left side of the wall we hit
+            if self.change_x > 0:
+                self.rect.right = wall.rect.left
+            else:
+                # Otherwise if we are moving left, do the opposite
+                self.rect.left = wall.rect.right
+
+    def movementy(self):
+        # Move the player up/down
+        self.rect.y += self.change_y
+        # Did we HIT A WALL while moving up/down
+        wall_hit_group = pygame.sprite.spritecollide(self, game.allwall_group, False)
+        for wall in wall_hit_group:
+            # Reset our position based on the top/bottom of the object.
+            if self.change_y > 0:
+                self.rect.bottom = wall.rect.top
+            else:
+                self.rect.top = wall.rect.bottom
+            
+# The donkey kong class - used in the boss fight at level 10
+class donkeykong(pygame.sprite.Sprite):
+    # Define the constructor for the wall class
+    def __init__(self, color, width, height, x, y):
+        super().__init__()
+        # Create a sprite and fill it with a the image
+        self.image = pygame.Surface([width,height])
+        self.image.fill(color)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        # Set a speed vector
+        self.change_x = 0
+        self.change_y = 0
+    
+    def update(self):
+        pass
 
 # Outerwall class
 class outerwall(pygame.sprite.Sprite):
@@ -326,6 +409,8 @@ class Game(object):
         self.barrel_group = pygame.sprite.Group()
         self.barreldeathwall_group = pygame.sprite.Group()
         self.coin_group = pygame.sprite.Group()
+        self.arenaplayer_group = pygame.sprite.Group()
+        self.donkeykong_group = pygame.sprite.Group()
         # This is a group for object that are part of the map (ladders and all walls) - used in the jumping mechanics and drawing order
         self.background_group = pygame.sprite.Group()
         # This is a group for sprites that move - used in the drawing order - this gets drawn after the background_group does
@@ -588,11 +673,39 @@ class Game(object):
                         1,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,1,
                         7,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,7,
                         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+            
+        # This is the donkey kong boss fight arena
+        self.level10 = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,9,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 
 
         # This list is used in the nextlevel() method
         # We have a 0 at index 0 to represent that there is nothing there, this is done because there is no level 0, levels start at 1, so the first map that can be iterated through is at index 1
-        self.alllevels = [0,self.level1,self.level2,self.level3,self.level4,self.level5,self.level6,self.level7,self.level8,self.level9]
+        # self.level1,self.level2,self.level3,self.level4,self.level5,self.level6,self.level7,self.level8,self.level9,
+        self.alllevels = [0,self.level10]
 
         # Calls the method levelsetup() so to build the map - this is still in the __init__() function
         self.levelsetup()
@@ -623,7 +736,7 @@ class Game(object):
         self.background_group.draw(screen)
         self.moving_sprites_group.draw(screen)
 
-        # Draws variables - lives, level
+        # Draws variables - lives, level, coins
         # For level number
         font = pygame.font.Font('freesansbold.ttf', 30)
         text = font.render(("LEVEL: " + str(self.level)), 1, WHITE)
@@ -724,6 +837,18 @@ class Game(object):
                 self.coin_group.add(self.myCoin)
                 self.background_group.add(self.myCoin)
                 self.all_sprites_group.add(self.myCoin)
+            # 9s in the array represent the starting position of arena players - this is only used for level 10
+            if self.levelselected[i] == 9:
+                self.myArenaplayer = arenaplayer(BLUE,40,40,temp_x,temp_y)
+                self.arenaplayer_group.add(self.myArenaplayer)
+                self.moving_sprites_group.add(self.myArenaplayer)
+                self.all_sprites_group.add(self.myArenaplayer)
+            # 10 in the array represents the starting position of donkey kong - this is only used for level 10
+            if self.levelselected[i] == 10:
+                self.myDonkeykong = donkeykong(DARKBROWN,80,80,temp_x,temp_y)
+                self.donkeykong_group.add(self.myDonkeykong)
+                self.moving_sprites_group.add(self.myDonkeykong)
+                self.all_sprites_group.add(self.myDonkeykong)
 
         # Print stuff - this goes at the bottom of this because the player must be created to have myPlayer.lives
         print("Level: ", int(self.level))
