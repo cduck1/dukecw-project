@@ -134,8 +134,9 @@ class player(pygame.sprite.Sprite):
         for wall in wall_hit_group:
             # This self.gravity ensures that there is no gravity acting on the player while the player is touching the ground (not side walls, only ground walls) - this is done because I think it will likely make the game run faster
             self.gravity = False
-            # Because we are touching the floor, we reset the ability to jump - you cant jump while on ladders
-            self.isJump = False
+            # Because we are touching the top of a floor, we reset the ability to jump - you cant jump while on ladders
+            if (self.rect.bottom == wall.rect.top) or (self.rect.bottom - 3 == wall.rect.top): # The -3 is because the player spawns in 3 pixels above the ground (until you hit left or right key) - not particularly sure why but this fixes it
+                self.isJump = False
             # Reset our position based on the top/bottom of the object.
             if self.change_y > 0:
                 self.rect.bottom = wall.rect.top
