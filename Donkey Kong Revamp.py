@@ -204,6 +204,15 @@ class arenaplayer(pygame.sprite.Sprite):
     def movementx(self):
         # Move the player left/right
         self.rect.x += self.change_x
+
+        # Making sure we don't go through donkey kong
+        if pygame.sprite.spritecollide(self,game.donkeykong_group,False):
+            if self.change_x > 0:
+                self.rect.right = game.myDonkeykong.rect.left
+            else:
+                # Otherwise if we are moving left, do the opposite
+                self.rect.left = game.myDonkeykong.rect.right
+
         # Did we HIT A WALL while moving left/right
         wall_hit_group = pygame.sprite.spritecollide(self, game.allwall_group, False)
         for wall in wall_hit_group:
@@ -217,6 +226,14 @@ class arenaplayer(pygame.sprite.Sprite):
     def movementy(self):
         # Move the player up/down
         self.rect.y += self.change_y
+
+        # Making sure we don't go through the player
+        if pygame.sprite.spritecollide(self,game.donkeykong_group,False):
+            if self.change_y > 0:
+                self.rect.bottom = game.myDonkeykong.rect.top
+            else:
+                self.rect.top = game.myDonkeykong.rect.bottom
+
         # Did we HIT A WALL while moving up/down
         wall_hit_group = pygame.sprite.spritecollide(self, game.allwall_group, False)
         for wall in wall_hit_group:
@@ -240,9 +257,62 @@ class donkeykong(pygame.sprite.Sprite):
         # Set a speed vector
         self.change_x = 0
         self.change_y = 0
+        # Variables
+        self.isMove = True
     
     def update(self):
-        pass
+        self.movementx()
+        self.movementy()
+
+        # Resets the speed change to 0 every update so that the speed doesn't accelerate infinitely
+        self.change_x = 0
+        self.change_y = 0
+
+    # Change the x and y speed of the player
+    def changespeed(self,x,y):
+        self.change_x += x
+        self.change_y += y
+
+    def movementx(self):
+        # Moves donkey kong towards mario slowly on the x axis - the + 20 and + 40 are to ensure donkey kong goes to the centre of the player
+        if self.isMove == True:
+            if game.myArenaplayer.rect.x + 20 > self.rect.x + 40:
+                self.changespeed(1,0)
+            if game.myArenaplayer.rect.x + 20 < self.rect.x + 40:
+                self.changespeed(-1,0)
+
+        # Move donkey kong left/right
+        self.rect.x += self.change_x
+
+        # Did we HIT A WALL while moving left/right
+        wall_hit_group = pygame.sprite.spritecollide(self, game.allwall_group, False)
+        for wall in wall_hit_group:
+            # If we are moving right, set our right side to the left side of the wall we hit
+            if self.change_x > 0:
+                self.rect.right = wall.rect.left
+            else:
+                # Otherwise if we are moving left, do the opposite
+                self.rect.left = wall.rect.right
+
+    def movementy(self):
+        # Moves donkey kong towards mario slowly on the y axis - the + 20 and + 40 are to ensure donkey kong goes to the centre of the player
+        if self.isMove == True:
+            if game.myArenaplayer.rect.y + 20 > self.rect.y + 40:
+                self.changespeed(0,1)
+            if game.myArenaplayer.rect.y + 20 < self.rect.y + 40:
+                self.changespeed(0,-1)
+
+        # Move donkey kong up/down
+        self.rect.y += self.change_y
+
+        # Did we HIT A WALL while moving up/down
+        wall_hit_group = pygame.sprite.spritecollide(self, game.allwall_group, False)
+        for wall in wall_hit_group:
+            # Reset our position based on the top/bottom of the object.
+            if self.change_y > 0:
+                self.rect.bottom = wall.rect.top
+            else:
+                self.rect.top = wall.rect.bottom
 
 # Outerwall class
 class outerwall(pygame.sprite.Sprite):
