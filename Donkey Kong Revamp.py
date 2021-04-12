@@ -244,9 +244,13 @@ class donkeykong(pygame.sprite.Sprite):
         self.change_y = 0
         # Variables
         self.isMove = True
-        self.playercollisiony = False
+        self.startpause = 0
+        self.leftrighthit = False
     
     def update(self):
+        # If donkey kong is not meant to be moving (isMove = False), ensure this occurs for a given period of time - this essentially ensures isMove is reset after a given period of time
+        if self.isMove == False:
+            self.pausemovement()
         self.movementx()
         self.movementy()
 
@@ -259,6 +263,11 @@ class donkeykong(pygame.sprite.Sprite):
         self.change_x += x
         self.change_y += y
 
+    def playerhit(self):
+        self.startpause = pygame.time.get_ticks()
+        self.isMove = False
+        self.leftrighthit = True
+            
     def movementx(self):
         # Moves donkey kong towards mario slowly on the x axis - the + 20 and + 40 are to ensure donkey kong goes to the centre of the player
         if self.isMove == True:
@@ -271,7 +280,8 @@ class donkeykong(pygame.sprite.Sprite):
         self.rect.x += self.change_x
 
         # Making sure we don't go through donkey kong
-        if (pygame.sprite.spritecollide(self,game.arenaplayer_group,False)) and (self.playercollisiony == False):
+        if pygame.sprite.spritecollide(self,game.arenaplayer_group,False) and self.leftrighthit == False:
+            self.playerhit()
             if self.change_x > 0:
                 self.rect.right = game.myArenaplayer.rect.left
             if self.change_x < 0:
@@ -299,13 +309,12 @@ class donkeykong(pygame.sprite.Sprite):
         # Move donkey kong up/down
         self.rect.y += self.change_y
 
-        # Making sure we don't   go through the player
-        if pygame.sprite.spritecollide(self,game.arenaplayer_group,False):
+        # Making sure we don't go through the player
+        if pygame.sprite.spritecollide(self,game.arenaplayer_group,False) and self.leftrighthit == False:
+            self.playerhit()
             if self.change_y > 0:
-                self.playercollisiony = True
                 self.rect.bottom = game.myArenaplayer.rect.top
             if self.change_y < 0:
-                self.playercollisiony = True
                 self.rect.top = game.myArenaplayer.rect.bottom
 
         # Did we HIT A WALL while moving up/down
@@ -317,20 +326,15 @@ class donkeykong(pygame.sprite.Sprite):
             if self.change_y < 0:
                 self.rect.top = wall.rect.bottom
 
-        # Resets playercollisiony every loop
-        self.playercollisiony = False
-
-    # Stops donkey kong from moving for a given time period after getting hit by the player
+    # Stops donkey kong from moving for a given time period after getting hit by the player - this essentially ensures isMove is reset after a given period of time
     def pausemovement(self):
-        startpause = pygame.time.get_ticks()
         nowtime = pygame.time.get_ticks()
-        pausedmovementtimer = nowtime - startpause
-        if pausedmovementtimer < 500:
-            self.isMove = False 
+        pausedmovementtimer = nowtime - self.startpause
+        if pausedmovementtimer < 1500:
             nowtime = pygame.time.get_ticks()
         else:
             self.isMove = True
-
+            self.leftrighthit = False
 
 # Outerwall class
 class outerwall(pygame.sprite.Sprite):
