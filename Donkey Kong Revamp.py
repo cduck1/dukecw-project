@@ -205,14 +205,6 @@ class arenaplayer(pygame.sprite.Sprite):
         # Move the player left/right
         self.rect.x += self.change_x
 
-        # Making sure we don't go through donkey kong
-        if pygame.sprite.spritecollide(self,game.donkeykong_group,False):
-            if self.change_x > 0:
-                self.rect.right = game.myDonkeykong.rect.left
-            else:
-                # Otherwise if we are moving left, do the opposite
-                self.rect.left = game.myDonkeykong.rect.right
-
         # Did we HIT A WALL while moving left/right
         wall_hit_group = pygame.sprite.spritecollide(self, game.allwall_group, False)
         for wall in wall_hit_group:
@@ -226,13 +218,6 @@ class arenaplayer(pygame.sprite.Sprite):
     def movementy(self):
         # Move the player up/down
         self.rect.y += self.change_y
-
-        # Making sure we don't go through the player
-        if pygame.sprite.spritecollide(self,game.donkeykong_group,False):
-            if self.change_y > 0:
-                self.rect.bottom = game.myDonkeykong.rect.top
-            else:
-                self.rect.top = game.myDonkeykong.rect.bottom
 
         # Did we HIT A WALL while moving up/down
         wall_hit_group = pygame.sprite.spritecollide(self, game.allwall_group, False)
@@ -259,6 +244,7 @@ class donkeykong(pygame.sprite.Sprite):
         self.change_y = 0
         # Variables
         self.isMove = True
+        self.playercollisiony = False
     
     def update(self):
         self.movementx()
@@ -284,13 +270,21 @@ class donkeykong(pygame.sprite.Sprite):
         # Move donkey kong left/right
         self.rect.x += self.change_x
 
+        # Making sure we don't go through donkey kong
+        if (pygame.sprite.spritecollide(self,game.arenaplayer_group,False)) and (self.playercollisiony == False):
+            if self.change_x > 0:
+                self.rect.right = game.myArenaplayer.rect.left
+            if self.change_x < 0:
+                # Otherwise if we are moving left, do the opposite
+                self.rect.left = game.myArenaplayer.rect.right
+
         # Did we HIT A WALL while moving left/right
         wall_hit_group = pygame.sprite.spritecollide(self, game.allwall_group, False)
         for wall in wall_hit_group:
             # If we are moving right, set our right side to the left side of the wall we hit
             if self.change_x > 0:
                 self.rect.right = wall.rect.left
-            else:
+            if self.change_x < 0:
                 # Otherwise if we are moving left, do the opposite
                 self.rect.left = wall.rect.right
 
@@ -305,14 +299,38 @@ class donkeykong(pygame.sprite.Sprite):
         # Move donkey kong up/down
         self.rect.y += self.change_y
 
+        # Making sure we don't   go through the player
+        if pygame.sprite.spritecollide(self,game.arenaplayer_group,False):
+            if self.change_y > 0:
+                self.playercollisiony = True
+                self.rect.bottom = game.myArenaplayer.rect.top
+            if self.change_y < 0:
+                self.playercollisiony = True
+                self.rect.top = game.myArenaplayer.rect.bottom
+
         # Did we HIT A WALL while moving up/down
         wall_hit_group = pygame.sprite.spritecollide(self, game.allwall_group, False)
         for wall in wall_hit_group:
             # Reset our position based on the top/bottom of the object.
             if self.change_y > 0:
                 self.rect.bottom = wall.rect.top
-            else:
+            if self.change_y < 0:
                 self.rect.top = wall.rect.bottom
+
+        # Resets playercollisiony every loop
+        self.playercollisiony = False
+
+    # Stops donkey kong from moving for a given time period after getting hit by the player
+    def pausemovement(self):
+        startpause = pygame.time.get_ticks()
+        nowtime = pygame.time.get_ticks()
+        pausedmovementtimer = nowtime - startpause
+        if pausedmovementtimer < 500:
+            self.isMove = False 
+            nowtime = pygame.time.get_ticks()
+        else:
+            self.isMove = True
+
 
 # Outerwall class
 class outerwall(pygame.sprite.Sprite):
