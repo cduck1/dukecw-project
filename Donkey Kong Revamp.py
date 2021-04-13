@@ -1,6 +1,7 @@
 import pygame
 import random
 import time
+import math
 
 # Defining colours
 BLACK = (0,0,0)
@@ -244,16 +245,17 @@ class donkeykong(pygame.sprite.Sprite):
         self.change_y = 0
         # Variables
         self.isMove = True
-        self.isPause = False
+        self.isPaused = False
         self.startpause = 0
+        self.starttimer = 0
     
     def update(self):
         # If donkey kong is not meant to be moving (isMove = False), ensure this occurs for a given period of time - this essentially ensures isMove is reset after a given period of time
-        if self.isMove == False:
-            self.pausemovement()
+        self.pausemovement()
+        self.throwbarrel()
         self.movementx()
         self.movementy()
-
+        
         # Resets the speed change to 0 every update so that the speed doesn't accelerate infinitely
         self.change_x = 0
         self.change_y = 0
@@ -322,17 +324,68 @@ class donkeykong(pygame.sprite.Sprite):
             if self.change_y < 0:
                 self.rect.top = wall.rect.bottom
 
+    def throwbarrel(self):
+        now = pygame.time.get_ticks()
+        if now - self.starttimer > 3000: # 3000 milliseconds is 3 seconds
+            # xdiff and ydiff calculate the difference in x and y values between the centre of donkey kong (where the barrel will be spawned) and the centre of the player
+            xdiff = (game.myArenaplayer.rect.x+20) - (self.rect.x+40)
+            ydiff = (game.myArenaplayer.rect.y+20) - (self.rect.y+40)
+            angle = math.atan2(ydiff,xdiff)
+            change_x = math.cos(angle) * 5 # Donkeybarrel is just 5 - makes the speed constant
+            change_y = math.sin(angle) * 5
+            # Spawn in the barrel
+            game.myDonkeybarrel = donkeybarrel(BROWN, 20, 20,change_x, change_y, self.rect.x + 30, self.rect.y + 30)
+            # Add the barrel to a barrel group and an all sprites group
+            game.donkeybarrel_group.add(game.myDonkeybarrel)
+            game.moving_sprites_group.add(game.myDonkeybarrel)
+            game.all_sprites_group.add(game.myDonkeybarrel)
+            self.starttimer = now
+            self.barrelspawned = True
+
     # Stops donkey kong from moving for a given time period after getting hit by the player - this essentially ensures isMove is reset after a given period of time
     def pausemovement(self):
         if self.isMove == False:
             nowtime = pygame.time.get_ticks()
             pausedmovementtimer = nowtime - self.startpause
             self.isPaused = True
-            if pausedmovementtimer < 1500:
+            if pausedmovementtimer < 1800:
                 nowtime = pygame.time.get_ticks()
             else:
                 self.isMove = True
-                self.isPause = False
+                self.isPaused = False
+
+# This is the class for the barrels that donkey kong throws in level 10
+class donkeybarrel(pygame.sprite.Sprite):
+    # Define the constructor for the wall class
+    def __init__(self, color, width, height,change_x,change_y, x, y):
+        super().__init__()
+        # Create a sprite and fill it with a the image
+        self.image = pygame.Surface([width,height])
+        self.image.fill(color)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        # Set a speed vector
+        self.change_x = change_x
+        self.change_y = change_y
+        
+        self.angle = 0
+        self.velocity = 5
+
+    def update(self):
+        self.movement()
+
+
+    # Change the x and y speed of the player
+    def changespeed(self,x,y):
+        self.change_x += x
+        self.change_y += y
+
+    # The barrel is thrown towards the player
+    def movement(self):
+        # Move the barrel
+        self.rect.x += self.change_x
+        self.rect.y += self.change_y
 
 # Outerwall class
 class outerwall(pygame.sprite.Sprite):
@@ -501,6 +554,7 @@ class Game(object):
         self.coin_group = pygame.sprite.Group()
         self.arenaplayer_group = pygame.sprite.Group()
         self.donkeykong_group = pygame.sprite.Group()
+        self.donkeybarrel_group = pygame.sprite.Group()
         # This is a group for object that are part of the map (ladders and all walls) - used in the jumping mechanics and drawing order
         self.background_group = pygame.sprite.Group()
         # This is a group for sprites that move - used in the drawing order - this gets drawn after the background_group does
