@@ -177,6 +177,8 @@ class arenaplayer(pygame.sprite.Sprite):
         # Set a speed vector
         self.change_x = 0
         self.change_y = 0
+        # Variables
+        self.health = 200
 
     def update(self):
         # Resets the speed change to 0 every update so that the speed doesn't accelerate infinitely
@@ -196,6 +198,7 @@ class arenaplayer(pygame.sprite.Sprite):
         # Made this code functions because it cleans up the previously cluttered update function significantly
         self.movementx()
         self.movementy()
+        self.barrelhit()
 
     # Change the x and y speed of the player
     def changespeed(self, x, y):
@@ -228,6 +231,11 @@ class arenaplayer(pygame.sprite.Sprite):
                 self.rect.bottom = wall.rect.top
             else:
                 self.rect.top = wall.rect.bottom
+            
+    def barrelhit(self):
+        if pygame.sprite.spritecollide(self, game.donkeybarrel_group, True):
+            self.health -= 50
+            print("Health: ", int(self.health))
             
 # The donkey kong class - used in the boss fight at level 10
 class donkeykong(pygame.sprite.Sprite):
@@ -331,10 +339,10 @@ class donkeykong(pygame.sprite.Sprite):
             xdiff = (game.myArenaplayer.rect.x+20) - (self.rect.x+40)
             ydiff = (game.myArenaplayer.rect.y+20) - (self.rect.y+40)
             angle = math.atan2(ydiff,xdiff)
-            change_x = math.cos(angle) * 5 # Donkeybarrel is just 5 - makes the speed constant
+            change_x = math.cos(angle) * 5 # 5 represents the velocity - this number makes the speed constant
             change_y = math.sin(angle) * 5
             # Spawn in the barrel
-            game.myDonkeybarrel = donkeybarrel(BROWN, 20, 20,change_x, change_y, self.rect.x + 30, self.rect.y + 30)
+            game.myDonkeybarrel = donkeybarrel(BROWN, 40, 40,change_x, change_y, self.rect.x + 30, self.rect.y + 30)
             # Add the barrel to a barrel group and an all sprites group
             game.donkeybarrel_group.add(game.myDonkeybarrel)
             game.moving_sprites_group.add(game.myDonkeybarrel)
@@ -369,23 +377,24 @@ class donkeybarrel(pygame.sprite.Sprite):
         self.change_x = change_x
         self.change_y = change_y
         
-        self.angle = 0
-        self.velocity = 5
-
     def update(self):
         self.movement()
-
-
-    # Change the x and y speed of the player
-    def changespeed(self,x,y):
-        self.change_x += x
-        self.change_y += y
+        self.destroyinnerwall()
+        self.die()
 
     # The barrel is thrown towards the player
     def movement(self):
         # Move the barrel
         self.rect.x += self.change_x
         self.rect.y += self.change_y
+    
+    # When a donkeybarrel (from level 10) hits an innerwall, the innerwall is destroyed along with the donkey barrel
+    def destroyinnerwall(self):
+        pygame.sprite.groupcollide(game.donkeybarrel_group,game.innerwall_group, True, True)         
+
+    def die(self):
+        if pygame.sprite.spritecollide(self,game.outerwall_group, False):
+            self.kill()
 
 # Outerwall class
 class outerwall(pygame.sprite.Sprite):
@@ -885,10 +894,15 @@ class Game(object):
         font = pygame.font.Font('freesansbold.ttf', 30)
         text = font.render(("LEVEL: " + str(self.level)), 1, WHITE)
         screen.blit(text, (10, 10))
-        # For player's lives
-        font = pygame.font.Font('freesansbold.ttf', 30)
-        text = font.render(("LIVES: " + str(self.lives)), 1, WHITE)
-        screen.blit(text, (10, 45))
+        # For player's lives - we only display lives if mario is in level 1-9, if mario makes it to level 10 the lives become irrelevant and he is given 200 health no matter how many lives he had left
+        if self.level < 10:
+            font = pygame.font.Font('freesansbold.ttf', 30)
+            text = font.render(("LIVES: " + str(self.lives)), 1, WHITE)
+            screen.blit(text, (10, 45))
+        else:
+            font = pygame.font.Font('freesansbold.ttf', 30)
+            text = font.render(("HEALTH: " + str(self.myArenaplayer.health)), 1, WHITE)
+            screen.blit(text, (10, 45))
         # For player's coins
         font = pygame.font.Font('freesansbold.ttf', 30)
         text = font.render(("COINS: " + str(self.coins)), 1, WHITE)
