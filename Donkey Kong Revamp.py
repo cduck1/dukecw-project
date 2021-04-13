@@ -179,6 +179,8 @@ class arenaplayer(pygame.sprite.Sprite):
         self.change_y = 0
         # Variables
         self.health = 200
+        self.hammerpickupgot = False
+        self.hammerswings = 0
 
     def update(self):
         # Resets the speed change to 0 every update so that the speed doesn't accelerate infinitely
@@ -194,11 +196,14 @@ class arenaplayer(pygame.sprite.Sprite):
             self.changespeed(0, -5)
         if keys[pygame.K_DOWN]:
             self.changespeed(0, 5)
+        if keys[pygame.K_SPACE]:
+            self.swinghammer()
 
         # Made this code functions because it cleans up the previously cluttered update function significantly
         self.movementx()
         self.movementy()
         self.barrelhit()
+        self.hammerpickuphit()
 
     # Change the x and y speed of the player
     def changespeed(self, x, y):
@@ -236,6 +241,15 @@ class arenaplayer(pygame.sprite.Sprite):
         if pygame.sprite.spritecollide(self, game.donkeybarrel_group, True):
             self.health -= 50
             print("Health: ", int(self.health))
+        
+    def hammerpickuphit(self):
+        if pygame.sprite.spritecollide(self, game.hammerpickup_group, True):
+            self.hammerpickupgot = True
+            self.hammerswings += 5 # When you pick up the hammerpickup, you gain 5 hits with the hammer
+    
+    def swinghammer(self):
+        pass
+            
             
 # The donkey kong class - used in the boss fight at level 10
 class donkeykong(pygame.sprite.Sprite):
@@ -256,7 +270,8 @@ class donkeykong(pygame.sprite.Sprite):
         self.isPaused = False
         self.startpause = 0
         self.starttimer = 0
-    
+        self.health = 1000
+
     def update(self):
         # If donkey kong is not meant to be moving (isMove = False), ensure this occurs for a given period of time - this essentially ensures isMove is reset after a given period of time
         self.pausemovement()
@@ -395,6 +410,34 @@ class donkeybarrel(pygame.sprite.Sprite):
     def die(self):
         if pygame.sprite.spritecollide(self,game.outerwall_group, False):
             self.kill()
+        
+# This is the hammerpickup class used to gain acces to the hammer that the player can then weild (for level 10)
+class hammerpickup(pygame.sprite.Sprite):
+    # Define the constructor for the wall class
+    def __init__(self, color, width, height, x, y):
+        super().__init__()
+        # Create a sprite and fill it with a the image
+        self.image = pygame.Surface([width,height])
+        self.image.fill(color)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        # Variables
+    
+    def update(self):
+        pass
+
+# This is the actual hammer that the player weilds and does damage with (for level 10)
+class hammer(pygame.sprite.Sprite):
+    # Define the constructor for the wall class
+    def __init__(self, color, width, height, x, y):
+        super().__init__()
+        # Create a sprite and fill it with a the image
+        self.image = pygame.Surface([width,height])
+        self.image.fill(color)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
 
 # Outerwall class
 class outerwall(pygame.sprite.Sprite):
@@ -564,6 +607,7 @@ class Game(object):
         self.arenaplayer_group = pygame.sprite.Group()
         self.donkeykong_group = pygame.sprite.Group()
         self.donkeybarrel_group = pygame.sprite.Group()
+        self.hammerpickup_group = pygame.sprite.Group()
         # This is a group for object that are part of the map (ladders and all walls) - used in the jumping mechanics and drawing order
         self.background_group = pygame.sprite.Group()
         # This is a group for sprites that move - used in the drawing order - this gets drawn after the background_group does
@@ -577,11 +621,14 @@ class Game(object):
         self.barrelspawncoordy = 0
         # This is the start timer which allows the barrel to spawn every 3 seconds
         self.start = pygame.time.get_ticks()
+        # This is the start timer which allows the hammer to spawn every 30 seconds
+        self.starttimer = pygame.time.get_ticks()
 
         # Variables
         self.level = 1
         self.lives = 3 # We refer to the game for the lives of the player as this allows the lives to be continued from level to level - the lives do not reset back to 3 every time you go to the next level
         self.coins = 0
+        self.hammerspawned = False # Ensures only one hammer is spawned every three seconds
 
         # Setting the gameRunning flag to false - when the game is exited, the eventprocess() method returns True, making done = True, which exits the game
         self.gameRunning = True
@@ -865,6 +912,7 @@ class Game(object):
 
     def update(self):
         self.spawnbarrels()
+        self.spawnhammerpickup()
 
     def spawnbarrels(self):
         now = pygame.time.get_ticks()
@@ -875,6 +923,38 @@ class Game(object):
             self.moving_sprites_group.add(self.myBarrel)
             self.all_sprites_group.add(self.myBarrel)
             self.start = now
+        
+    def spawnhammerpickup(self):
+        if self.level == 1:
+            now = pygame.time.get_ticks()
+            if now - self.starttimer > 3000: # 3000 milliseconds is 3 seconds
+                self.hammerspawned = False
+                self.starttimer = now
+                for i in range (0,1200):
+                    # temp_x and temp_y are the temporary values where the wall will be created for that iteration of the for loop, so if there is a 1 at that position, it will be created at a different x and y each time
+                    # We have an if i == 0 here because we need the walls to start at zero, if it didnt we would start with temp_x = temp_x + 40 and so fourth
+                    # Add 40 to the x coordinate for the wall when there is a y in the list
+                    if i == 0:
+                        temp_x = 0
+                    else:
+                        temp_x = temp_x + 40
+                        
+                    # Increases the y value (goes down to the next row of walls) once the row is filled (after 25 elements in the list), but dont change it when i = 0
+                    if i == 0:
+                        temp_y = 0
+                    elif i % 48 == 0:
+                        temp_x = 0
+                        temp_y = temp_y + 40
+                    # 0s in the array represent empty space
+                    if self.levelselected[i] == 0 and self.hammerspawned == False:
+                        spawnhammerpickup = random.randint(0,1000) # There is a 1 in 1000 chance of a hammerpickup spawning at each empty "tile" in the map
+                        if spawnhammerpickup == 1:
+                            self.myHammerpickup = hammerpickup(PINK, 40, 40, temp_x, temp_y)
+                            self.hammerpickup_group.add(self.myHammerpickup)
+                            self.moving_sprites_group.add(self.myHammerpickup)
+                            self.all_sprites_group.add(self.myHammerpickup)
+                            # If a hammerpickup has been spawned, we stop trying to spawn hammerpickup in the map
+                            self.hammerspawned = True
 
     # Method where all the game logic goes
     def runlogic(self):
