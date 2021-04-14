@@ -308,8 +308,7 @@ class donkeykong(pygame.sprite.Sprite):
         self.throwbarrel()
         self.movementx()
         self.movementy()
-        self.healthbar()
-        
+                
         # Resets the speed change to 0 every update so that the speed doesn't accelerate infinitely
         self.change_x = 0
         self.change_y = 0
@@ -1019,6 +1018,7 @@ class Game(object):
         # Draws the sprites
         self.background_group.draw(screen)
         self.moving_sprites_group.draw(screen)
+        game.myDonkeykong.healthbar()
 
         # Draws variables - lives, level, coins
         # For level number
