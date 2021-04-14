@@ -181,8 +181,8 @@ class arenaplayer(pygame.sprite.Sprite):
         self.health = 200
         self.swingcooldown = False
         self.hammerswings = 0
-        self.starttimer = 0 # timer for the time the hammer is displayed
-        self.starttime = 0 # timer for the cooldown on hammer swings
+        self.starttimer = 0 # timer for the cooldown on hammer swings
+        self.starttime = 0 # timer for the hammer animation
         self.hammerpresent = False
 
     def update(self):
@@ -207,7 +207,7 @@ class arenaplayer(pygame.sprite.Sprite):
         self.hammerpickuphit()
         self.swinghammer()
         self.hammercooldown()
-        #self.hammeranimation()
+        self.hammeranimation()
 
     # Change the x and y speed of the player
     def changespeed(self, x, y):
@@ -249,51 +249,35 @@ class arenaplayer(pygame.sprite.Sprite):
     def hammerpickuphit(self):
         if pygame.sprite.spritecollide(self, game.hammerpickup_group, True):
             self.hammerswings += 5 # When you pick up the hammerpickup, you gain 5 hits with the hammer
-
     
     def swinghammer(self):
-        self.starttimer = pygame.time.get_ticks() # not sure why this is needed here but it didnt work without because now was way too high of a value
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE]:
             if (self.hammerswings > 0) and (self.swingcooldown == False):
-                now = pygame.time.get_ticks()
-                timedifference = now - self.starttimer
-                if (timedifference < 4000) and (self.hammerpresent == False):
-                    game.myHammer = hammer(PINK, 10, 4, self.rect.x + 40, self.rect.y + 18)
-                    game.hammer_group.add(game.myHammer)
-                    game.moving_sprites_group.add(game.myHammer)
-                    game.all_sprites_group.add(game.myHammer)
-                    self.hammerswings -= 1
-                    self.hammerpresent = True
-                    self.starttimer = now
-                else:
-                    self.swingcooldown = True
-                    self.hammerpresent = False
-                    game.myHammer.kill()               
-                    self.starttimer = now
-
-            #if (self.hammerswings > 0) and (self.swingcooldown == False):
-            #    game.myHammer = hammer(PINK, 10, 4, self.rect.x + 40, self.rect.y + 18)
-            #    game.hammer_group.add(game.myHammer)
-            #    game.moving_sprites_group.add(game.myHammer)
-            #    game.all_sprites_group.add(game.myHammer)
-            #    self.hammerswings -= 1
-            #   self.hammerpresent = True
-            #    self.swingcooldown = True
+                game.myHammer = hammer(PINK, 10, 4, self.rect.x + 40, self.rect.y + 18)
+                game.hammer_group.add(game.myHammer)
+                game.moving_sprites_group.add(game.myHammer)
+                game.all_sprites_group.add(game.myHammer)
+                self.hammerswings -= 1
+                self.hammerpresent = True
+                self.swingcooldown = True
 
     # Is responsible for a cooldown meaning the hammer can only be swung once every 2 seconds
     def hammercooldown(self):
         if self.swingcooldown == True:
             now = pygame.time.get_ticks()
-            if now - self.starttime > 2000: # 2000 milliseconds (ticks) is 2 seconds
+            if now - self.starttimer > 2000: # 2000 milliseconds (ticks) is 2 seconds
                 self.swingcooldown = False
-                self.starttime = now
+                self.starttimer = now
+            else:
+                self.swingcooldown = True
 
     def hammeranimation(self):
         if self.hammerpresent == True:
             now = pygame.time.get_ticks()
             if now - self.starttime > 1000: # the animation of the hammer being swung lasts 1 second 
                 game.myHammer.kill()
+                print("HIHI")
                 self.hammerpresent = False
                 self.starttime = now
 
