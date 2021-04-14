@@ -297,6 +297,10 @@ class donkeykong(pygame.sprite.Sprite):
         self.startpause = 0
         self.starttimer = 0
         self.health = 1000
+        # Health bar variables
+        self.maxhealth = 1000
+        self.health_bar_length = 1000
+        self.health_ratio = self.maxhealth / self.health_bar_length
 
     def update(self):
         # If donkey kong is not meant to be moving (isMove = False), ensure this occurs for a given period of time - this essentially ensures isMove is reset after a given period of time
@@ -304,6 +308,7 @@ class donkeykong(pygame.sprite.Sprite):
         self.throwbarrel()
         self.movementx()
         self.movementy()
+        self.healthbar()
         
         # Resets the speed change to 0 every update so that the speed doesn't accelerate infinitely
         self.change_x = 0
@@ -313,6 +318,10 @@ class donkeykong(pygame.sprite.Sprite):
     def changespeed(self,x,y):
         self.change_x += x
         self.change_y += y
+
+    def healthbar(self):
+        pygame.draw.rect(screen, (255,0,0),(420,50,self.health/self.health_ratio,25))
+        pygame.draw.rect(screen,(255,255,255),(420,50,self.health_bar_length,25),4)
 
     def movementx(self):
         # Moves donkey kong towards mario slowly on the x axis - the + 20 and + 40 are to ensure donkey kong goes to the centre of the player
@@ -476,7 +485,8 @@ class hammer(pygame.sprite.Sprite):
         self.rect.y = game.myArenaplayer.rect.y + 18
 
     def donkeyhit(self):
-        if pygame.sprite.spritecollide(self,game.donkeykong_group,True): # The hammer is killed when it hits donkey kong
+        if pygame.sprite.spritecollide(self,game.donkeykong_group,False): # The hammer is killed when it hits donkey kong
+            self.kill()
             game.myDonkeykong.health -= 100
             print("DONKEY KONG HEALTH: ", game.myDonkeykong.health)
 
