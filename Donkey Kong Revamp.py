@@ -205,8 +205,8 @@ class arenaplayer(pygame.sprite.Sprite):
         self.movementy()
         self.barrelhit()
         self.hammerpickuphit()
-        self.swinghammer()
         self.hammercooldown()
+        self.swinghammer()
         self.hammeranimation()
 
     # Change the x and y speed of the player
@@ -249,18 +249,6 @@ class arenaplayer(pygame.sprite.Sprite):
     def hammerpickuphit(self):
         if pygame.sprite.spritecollide(self, game.hammerpickup_group, True):
             self.hammerswings += 5 # When you pick up the hammerpickup, you gain 5 hits with the hammer
-    
-    def swinghammer(self):
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE]:
-            if (self.hammerswings > 0) and (self.swingcooldown == False):
-                game.myHammer = hammer(PINK, 10, 4, self.rect.x + 40, self.rect.y + 18)
-                game.hammer_group.add(game.myHammer)
-                game.moving_sprites_group.add(game.myHammer)
-                game.all_sprites_group.add(game.myHammer)
-                self.hammerswings -= 1
-                self.hammerpresent = True
-                self.swingcooldown = True
 
     # Is responsible for a cooldown meaning the hammer can only be swung once every 2 seconds
     def hammercooldown(self):
@@ -269,15 +257,23 @@ class arenaplayer(pygame.sprite.Sprite):
             if now - self.starttimer > 2000: # 2000 milliseconds (ticks) is 2 seconds
                 self.swingcooldown = False
                 self.starttimer = now
-            else:
+
+    def swinghammer(self):
+        if pygame.key.get_pressed()[pygame.K_SPACE]: # This is so you must press the space bar to swing the hammer - not just hold it down constantely
+            if (self.hammerswings > 0) and (self.swingcooldown == False) and (self.hammerpresent == False):
+                self.myHammer = hammer(PINK, 10, 4, self.rect.x + 40, self.rect.y + 18)
+                game.hammer_group.add(self.myHammer)
+                game.moving_sprites_group.add(self.myHammer)
+                game.all_sprites_group.add(self.myHammer)
+                self.hammerswings -= 1
+                self.hammerpresent = True
                 self.swingcooldown = True
 
     def hammeranimation(self):
         if self.hammerpresent == True:
             now = pygame.time.get_ticks()
             if now - self.starttime > 1000: # the animation of the hammer being swung lasts 1 second 
-                game.myHammer.kill()
-                print("HIHI")
+                self.myHammer.kill()
                 self.hammerpresent = False
                 self.starttime = now
 
@@ -480,13 +476,9 @@ class hammer(pygame.sprite.Sprite):
         self.rect.y = game.myArenaplayer.rect.y + 18
 
     def donkeyhit(self):
-        if pygame.sprite.spritecollide(self,game.donkeykong_group,False):
-            now = pygame.time.get_ticks()
-            if now - self.start > 1000: # This is done so that you only do 100 damage per swing (a swing lasts 1 second (1000 ticks)) - instead of 100 damage per tick that they are collided
-                game.myDonkeykong.health -= 100
-                print("DONKEY KONG HEALTH: ", game.myDonkeykong.health)
-                self.start = now
-
+        if pygame.sprite.spritecollide(self,game.donkeykong_group,True): # The hammer is killed when it hits donkey kong
+            game.myDonkeykong.health -= 100
+            print("DONKEY KONG HEALTH: ", game.myDonkeykong.health)
 
 # Outerwall class
 class outerwall(pygame.sprite.Sprite):
