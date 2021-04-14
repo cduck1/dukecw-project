@@ -181,8 +181,8 @@ class arenaplayer(pygame.sprite.Sprite):
         self.health = 200
         self.swingcooldown = False
         self.hammerswings = 0
-        self.starttimer = 0 # timer for the cooldown on hammer swings
-        self.starttime = 0 # timer for the hammer animation
+        self.starttimer = 0 # timer for the time the hammer is displayed
+        self.starttime = 0 # timer for the cooldown on hammer swings
         self.hammerpresent = False
 
     def update(self):
@@ -204,10 +204,10 @@ class arenaplayer(pygame.sprite.Sprite):
         self.movementx()
         self.movementy()
         self.barrelhit()
-        self.hammercooldown()
         self.hammerpickuphit()
         self.swinghammer()
-        self.hammeranimation()
+        self.hammercooldown()
+        #self.hammeranimation()
 
     # Change the x and y speed of the player
     def changespeed(self, x, y):
@@ -250,33 +250,52 @@ class arenaplayer(pygame.sprite.Sprite):
         if pygame.sprite.spritecollide(self, game.hammerpickup_group, True):
             self.hammerswings += 5 # When you pick up the hammerpickup, you gain 5 hits with the hammer
 
-    # Is responsible for a cooldown meaning the hammer can only be swung once every 2 seconds
-    def hammercooldown(self):
-        now = pygame.time.get_ticks()
-        if now - self.starttimer < 2000: # 2000 milliseconds (ticks) is 2 seconds
-            self.swingcooldown = False
-        else:
-            self.swingcooldown = True
-            self.starttimer = now
     
     def swinghammer(self):
+        self.starttimer = pygame.time.get_ticks() # not sure why this is needed here but it didnt work without because now was way too high of a value
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE]:
-            if self.hammerswings > 0 and self.swingcooldown == False:
-                self.hammerswings -= 1
-                self.hammerpresent = True
-                game.myHammer = hammer(PINK, 10, 4, self.rect.x + 40, self.rect.y + 18)
-                game.hammer_group.add(game.myHammer)
-                game.moving_sprites_group.add(game.myHammer)
-                game.all_sprites_group.add(game.myHammer)
+            if (self.hammerswings > 0) and (self.swingcooldown == False):
+                now = pygame.time.get_ticks()
+                timedifference = now - self.starttimer
+                if (timedifference < 4000) and (self.hammerpresent == False):
+                    game.myHammer = hammer(PINK, 10, 4, self.rect.x + 40, self.rect.y + 18)
+                    game.hammer_group.add(game.myHammer)
+                    game.moving_sprites_group.add(game.myHammer)
+                    game.all_sprites_group.add(game.myHammer)
+                    self.hammerswings -= 1
+                    self.hammerpresent = True
+                    self.starttimer = now
+                else:
+                    self.swingcooldown = True
+                    self.hammerpresent = False
+                    game.myHammer.kill()               
+                    self.starttimer = now
+
+            #if (self.hammerswings > 0) and (self.swingcooldown == False):
+            #    game.myHammer = hammer(PINK, 10, 4, self.rect.x + 40, self.rect.y + 18)
+            #    game.hammer_group.add(game.myHammer)
+            #    game.moving_sprites_group.add(game.myHammer)
+            #    game.all_sprites_group.add(game.myHammer)
+            #    self.hammerswings -= 1
+            #   self.hammerpresent = True
+            #    self.swingcooldown = True
+
+    # Is responsible for a cooldown meaning the hammer can only be swung once every 2 seconds
+    def hammercooldown(self):
+        if self.swingcooldown == True:
+            now = pygame.time.get_ticks()
+            if now - self.starttime > 2000: # 2000 milliseconds (ticks) is 2 seconds
+                self.swingcooldown = False
+                self.starttime = now
 
     def hammeranimation(self):
         if self.hammerpresent == True:
             now = pygame.time.get_ticks()
             if now - self.starttime > 1000: # the animation of the hammer being swung lasts 1 second 
                 game.myHammer.kill()
+                self.hammerpresent = False
                 self.starttime = now
-                self.swingcooldown
 
 # The donkey kong class - used in the boss fight at level 10
 class donkeykong(pygame.sprite.Sprite):
@@ -672,7 +691,7 @@ class Game(object):
         self.starttimer = pygame.time.get_ticks()
 
         # Variables
-        self.level = 1
+        self.level = 10
         self.lives = 3 # We refer to the game for the lives of the player as this allows the lives to be continued from level to level - the lives do not reset back to 3 every time you go to the next level
         self.coins = 0
         self.hammerspawned = False # Ensures only one hammer is spawned every three seconds
@@ -951,8 +970,7 @@ class Game(object):
 
         # This list is used in the nextlevel() method
         # We have a 0 at index 0 to represent that there is nothing there, this is done because there is no level 0, levels start at 1, so the first map that can be iterated through is at index 1
-        # self.level1,self.level2,self.level3,self.level4,self.level5,self.level6,self.level7,self.level8,self.level9,
-        self.alllevels = [0,self.level10]
+        self.alllevels = [0,self.level1,self.level2,self.level3,self.level4,self.level5,self.level6,self.level7,self.level8,self.level9,self.level10]
 
         # Calls the method levelsetup() so to build the map - this is still in the __init__() function
         self.levelsetup()
@@ -972,7 +990,7 @@ class Game(object):
             self.start = now
         
     def spawnhammerpickup(self):
-        if self.level == 1:
+        if self.level == 10:
             now = pygame.time.get_ticks()
             if now - self.starttimer > 3000: # 3000 milliseconds is 3 seconds
                 self.hammerspawned = False
@@ -1030,6 +1048,11 @@ class Game(object):
             font = pygame.font.Font('freesansbold.ttf', 30)
             text = font.render(("HEALTH: " + str(self.myArenaplayer.health)), 1, WHITE)
             screen.blit(text, (10, 45))
+
+            # During level 10 we also display hammerswings
+            font = pygame.font.Font('freesansbold.ttf', 30)
+            text = font.render(("HAMMER SWINGS: " + str(self.myArenaplayer.hammerswings)), 1, WHITE)
+            screen.blit(text, (10, 115))
         # For player's coins
         font = pygame.font.Font('freesansbold.ttf', 30)
         text = font.render(("COINS: " + str(self.coins)), 1, WHITE)
