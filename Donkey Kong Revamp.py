@@ -74,6 +74,7 @@ class player(pygame.sprite.Sprite):
             self.changespeed(5, 0)
 
         # Made this code functions because it cleans up the previously cluttered update function significantly
+        self.die()
         self.jumping()
         self.gravityon()
         self.movehorizontal()
@@ -90,6 +91,11 @@ class player(pygame.sprite.Sprite):
     def changespeed(self, x, y):
         self.change_x += x
         self.change_y += y
+    
+    def die(self):
+        if game.lives < 0:
+            game.youlose()
+
 
     def jumping(self):
         nowtime = pygame.time.get_ticks()
@@ -204,6 +210,7 @@ class arenaplayer(pygame.sprite.Sprite):
             self.changespeed(0, 5)
 
         # Made this code functions because it cleans up the previously cluttered update function significantly
+        self.die()
         self.movementx()
         self.movementy()
         self.barrelhit()
@@ -216,6 +223,10 @@ class arenaplayer(pygame.sprite.Sprite):
     def changespeed(self, x, y):
         self.change_x += x
         self.change_y += y
+
+    def die(self):
+        if self.health <= 0:
+            game.youlose()
 
     def healthbar(self):
         pygame.draw.rect(screen, (255,0,0),(self.rect.x-10,self.rect.y - 15,self.health/self.health_ratio,10))
@@ -310,6 +321,7 @@ class donkeykong(pygame.sprite.Sprite):
         self.health_ratio = self.maxhealth / self.health_bar_length
 
     def update(self):
+        self.die()
         # If donkey kong is not meant to be moving (isMove = False), ensure this occurs for a given period of time - this essentially ensures isMove is reset after a given period of time
         self.pausemovement()
         self.throwbarrel()
@@ -324,6 +336,11 @@ class donkeykong(pygame.sprite.Sprite):
     def changespeed(self,x,y):
         self.change_x += x
         self.change_y += y
+
+    def die(self):
+        if self.health <= 0:
+            game.coins += 200 # You gain 200 coins when you win/ beat the game
+            game.youwin()
 
     def healthbar(self):
         pygame.draw.rect(screen, (255,0,0),(420,50,self.health/self.health_ratio,25))
@@ -687,6 +704,7 @@ class Game(object):
         self.lives = 3 # We refer to the game for the lives of the player as this allows the lives to be continued from level to level - the lives do not reset back to 3 every time you go to the next level
         self.coins = 0
         self.hammerspawned = False # Ensures only one hammer is spawned every three seconds
+        self.endscreen = False # This is used to stop the barrels from spawning during the youlose screen and to stop previous text front being drawn again
 
         # Setting the gameRunning flag to false - when the game is exited, the eventprocess() method returns True, making done = True, which exits the game
         self.gameRunning = True
@@ -972,14 +990,15 @@ class Game(object):
         self.spawnhammerpickup()
 
     def spawnbarrels(self):
-        now = pygame.time.get_ticks()
-        if now - self.start > 3000: # 3000 milliseconds is 3 seconds
-            self.myBarrel = barrel(BROWN, 20, 20, self.barrelspawncoordx, self.barrelspawncoordy)
-            # Add the barrel to a barrel group and an all sprites group
-            self.barrel_group.add(self.myBarrel)
-            self.moving_sprites_group.add(self.myBarrel)
-            self.all_sprites_group.add(self.myBarrel)
-            self.start = now
+        if (self.level < 10) and (self.endscreen == False):
+            now = pygame.time.get_ticks()
+            if now - self.start > 3000: # 3000 milliseconds is 3 seconds
+                self.myBarrel = barrel(BROWN, 20, 20, self.barrelspawncoordx, self.barrelspawncoordy)
+                # Add the barrel to a barrel group and an all sprites group
+                self.barrel_group.add(self.myBarrel)
+                self.moving_sprites_group.add(self.myBarrel)
+                self.all_sprites_group.add(self.myBarrel)
+                self.start = now
         
     def spawnhammerpickup(self):
         if self.level == 10:
@@ -1030,28 +1049,29 @@ class Game(object):
             game.myArenaplayer.healthbar()
 
         # Draws variables - lives, level, coins
-        # For level number
-        font = pygame.font.Font('freesansbold.ttf', 30)
-        text = font.render(("LEVEL: " + str(self.level)), 1, WHITE)
-        screen.blit(text, (10, 10))
-        # For player's lives - we only display lives if mario is in level 1-9, if mario makes it to level 10 the lives become irrelevant and he is given 200 health no matter how many lives he had left
-        if self.level < 10:
+        if self.endscreen == False:
+            # For level number
             font = pygame.font.Font('freesansbold.ttf', 30)
-            text = font.render(("LIVES: " + str(self.lives)), 1, WHITE)
-            screen.blit(text, (10, 45))
-        else:
-            font = pygame.font.Font('freesansbold.ttf', 30)
-            text = font.render(("HEALTH: " + str(self.myArenaplayer.health)), 1, WHITE)
-            screen.blit(text, (10, 45))
+            text = font.render(("LEVEL: " + str(self.level)), 1, WHITE)
+            screen.blit(text, (10, 10))
+            # For player's lives - we only display lives if mario is in level 1-9, if mario makes it to level 10 the lives become irrelevant and he is given 200 health no matter how many lives he had left
+            if self.level < 10:
+                font = pygame.font.Font('freesansbold.ttf', 30)
+                text = font.render(("LIVES: " + str(self.lives)), 1, WHITE)
+                screen.blit(text, (10, 45))
+            else:
+                font = pygame.font.Font('freesansbold.ttf', 30)
+                text = font.render(("HEALTH: " + str(self.myArenaplayer.health)), 1, WHITE)
+                screen.blit(text, (10, 45))
 
-            # During level 10 we also display hammerswings
+                # During level 10 we also display hammerswings
+                font = pygame.font.Font('freesansbold.ttf', 30)
+                text = font.render(("HAMMER SWINGS: " + str(self.myArenaplayer.hammerswings)), 1, WHITE)
+                screen.blit(text, (10, 115))
+            # For player's coins
             font = pygame.font.Font('freesansbold.ttf', 30)
-            text = font.render(("HAMMER SWINGS: " + str(self.myArenaplayer.hammerswings)), 1, WHITE)
-            screen.blit(text, (10, 115))
-        # For player's coins
-        font = pygame.font.Font('freesansbold.ttf', 30)
-        text = font.render(("COINS: " + str(self.coins)), 1, WHITE)
-        screen.blit(text, (10, 80))
+            text = font.render(("COINS: " + str(self.coins)), 1, WHITE)
+            screen.blit(text, (10, 80))
 
         # Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
@@ -1168,6 +1188,67 @@ class Game(object):
     def nextlevel(self):
         # self.alllevels is a list of maps of levels, self.level is the current level that the player is on - if self.level = 1, then the map chosen would be whatever were at index 1 (map/ level 2)
         self.levelselected = self.alllevels[self.level]
+    
+    # The method for what happens when you die
+    def youlose(self):
+        self.endscreen = True
+        # This get's rid of the current level's sprites
+        for sprite in game.all_sprites_group:
+            sprite.kill()
+            
+        screen.fill(BLACK) # Removes any written text (e.g. on-screen variables, healthbars, etc...)
+
+        # Displays "GAME OVER" on the end screen - signifying you died
+        font = pygame.font.Font('freesansbold.ttf', 30)
+        text = font.render(("GAME OVER"), 1, WHITE)
+        screen.blit(text, (900, 500))
+
+        # Displays "YOU LOSE" on the end screen below "GAME OVER" - signifying you died
+        font = pygame.font.Font('freesansbold.ttf', 30)
+        text = font.render(("YOU LOSE"), 1, WHITE)
+        screen.blit(text, (900, 540))
+
+        # Displayes the player's coins in the endscreen
+        font = pygame.font.Font('freesansbold.ttf', 20)
+        text = font.render(("COINS: " + str(self.coins)), 1, WHITE)
+        screen.blit(text, (900, 580))
+
+        # Updates the screen
+        pygame.display.flip()
+
+        pygame.time.wait(30000) # The program pauses every (to stop the screen being updated again by the game.display() method - so that the endscreen is kept there) for 30 seconds (30000 milliseconds) and then the program closes
+
+        pygame.quit()
+    
+    def youwin(self):
+        self.endscreen = True
+        # This get's rid of the current level's sprites
+        for sprite in game.all_sprites_group:
+            sprite.kill()
+            
+        screen.fill(BLACK) # Removes any written text (e.g. on-screen variables, healthbars, etc...)
+
+        # Displays "GAME OVER" and "YOU LOSE" on the end screen - signifying you died
+        font = pygame.font.Font('freesansbold.ttf', 30)
+        text = font.render(("GAME OVER"), 1, WHITE)
+        screen.blit(text, (900, 500))
+
+        # Displays "YOU WIN" on the end screen below "GAME OVER" - signifying you died
+        font = pygame.font.Font('freesansbold.ttf', 30)
+        text = font.render(("YOU WIN"), 1, WHITE)
+        screen.blit(text, (900, 540))
+
+        # Displayes the player's coins in the endscreen
+        font = pygame.font.Font('freesansbold.ttf', 20)
+        text = font.render(("COINS: " + str(self.coins)), 1, WHITE)
+        screen.blit(text, (900, 580))
+
+        # Updates the screen
+        pygame.display.flip()
+
+        pygame.time.wait(30000) # The program pauses every (to stop the screen being updated again by the game.display() method - so that the endscreen is kept there) for 30 seconds (30000 milliseconds) and then the program closes
+
+        pygame.quit() 
 
 # STAYS OUTSIDE OF ANY CLASS
 game = Game()
