@@ -94,8 +94,7 @@ class player(pygame.sprite.Sprite):
     
     def die(self):
         if game.lives < 0:
-            game.youlose()
-
+            game.youlose = True
 
     def jumping(self):
         nowtime = pygame.time.get_ticks()
@@ -226,7 +225,7 @@ class arenaplayer(pygame.sprite.Sprite):
 
     def die(self):
         if self.health <= 0:
-            game.youlose()
+            game.youlose = True
 
     def healthbar(self):
         pygame.draw.rect(screen, (255,0,0),(self.rect.x-10,self.rect.y - 15,self.health/self.health_ratio,10))
@@ -340,7 +339,7 @@ class donkeykong(pygame.sprite.Sprite):
     def die(self):
         if self.health <= 0:
             game.coins += 200 # You gain 200 coins when you win/ beat the game
-            game.youwin()
+            game.youwin = True
 
     def healthbar(self):
         pygame.draw.rect(screen, (255,0,0),(420,50,self.health/self.health_ratio,25))
@@ -705,6 +704,8 @@ class Game(object):
         self.coins = 0
         self.hammerspawned = False # Ensures only one hammer is spawned every three seconds
         self.endscreen = False # This is used to stop the barrels from spawning during the youlose screen and to stop previous text front being drawn again
+        self.youlose = False
+        self.youwin = False
 
         # Setting the gameRunning flag to false - when the game is exited, the eventprocess() method returns True, making done = True, which exits the game
         self.gameRunning = True
@@ -1073,6 +1074,9 @@ class Game(object):
             text = font.render(("COINS: " + str(self.coins)), 1, WHITE)
             screen.blit(text, (10, 80))
 
+        self.losescreen()
+        self.winscreen()
+
         # Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
 
@@ -1190,65 +1194,63 @@ class Game(object):
         self.levelselected = self.alllevels[self.level]
     
     # The method for what happens when you die
-    def youlose(self):
-        self.endscreen = True
-        # This get's rid of the current level's sprites
-        for sprite in game.all_sprites_group:
-            sprite.kill()
-            
-        screen.fill(BLACK) # Removes any written text (e.g. on-screen variables, healthbars, etc...)
+    def losescreen(self):
+        if self.youlose == True:
+            self.endscreen = True
+            # This get's rid of the current level's sprites
+            for sprite in game.all_sprites_group:
+                sprite.kill()
+                
+            screen.fill(BLACK) # Removes any written text (e.g. on-screen variables, healthbars, etc...)
 
-        # Displays "GAME OVER" on the end screen - signifying you died
-        font = pygame.font.Font('freesansbold.ttf', 30)
-        text = font.render(("GAME OVER"), 1, WHITE)
-        screen.blit(text, (900, 500))
+            # Displays "GAME OVER" on the end screen - signifying you died
+            font = pygame.font.Font('freesansbold.ttf', 30)
+            text = font.render(("GAME OVER"), 1, WHITE)
+            screen.blit(text, (900, 500))
 
-        # Displays "YOU LOSE" on the end screen below "GAME OVER" - signifying you died
-        font = pygame.font.Font('freesansbold.ttf', 30)
-        text = font.render(("YOU LOSE"), 1, WHITE)
-        screen.blit(text, (900, 540))
+            # Displays "YOU LOSE" on the end screen below "GAME OVER" - signifying you died
+            font = pygame.font.Font('freesansbold.ttf', 30)
+            text = font.render(("YOU LOSE"), 1, WHITE)
+            screen.blit(text, (900, 540))
 
-        # Displayes the player's coins in the endscreen
-        font = pygame.font.Font('freesansbold.ttf', 20)
-        text = font.render(("COINS: " + str(self.coins)), 1, WHITE)
-        screen.blit(text, (900, 580))
+            # Displayes the player's coins in the endscreen
+            font = pygame.font.Font('freesansbold.ttf', 20)
+            text = font.render(("COINS: " + str(self.coins)), 1, WHITE)
+            screen.blit(text, (900, 580))
 
-        # Updates the screen
-        pygame.display.flip()
+            # Updates the screen
+            pygame.display.flip()
 
-        pygame.time.wait(30000) # The program pauses every (to stop the screen being updated again by the game.display() method - so that the endscreen is kept there) for 30 seconds (30000 milliseconds) and then the program closes
-
-        pygame.quit()
+            #pygame.sleep(30000) # The program pauses every (to stop the screen being updated again by the game.display() method - so that the endscreen is kept there) for 30 seconds (30000 milliseconds) and then the program closes
     
-    def youwin(self):
-        self.endscreen = True
-        # This get's rid of the current level's sprites
-        for sprite in game.all_sprites_group:
-            sprite.kill()
-            
-        screen.fill(BLACK) # Removes any written text (e.g. on-screen variables, healthbars, etc...)
+    def winscreen(self):
+        if self.youwin == True:
+            self.endscreen = True
+            # This get's rid of the current level's sprites
+            for sprite in game.all_sprites_group:
+                sprite.kill()
+                
+            screen.fill(BLACK) # Removes any written text (e.g. on-screen variables, healthbars, etc...)
 
-        # Displays "GAME OVER" and "YOU LOSE" on the end screen - signifying you died
-        font = pygame.font.Font('freesansbold.ttf', 30)
-        text = font.render(("GAME OVER"), 1, WHITE)
-        screen.blit(text, (900, 500))
+            # Displays "GAME OVER" and "YOU LOSE" on the end screen - signifying you died
+            font = pygame.font.Font('freesansbold.ttf', 30)
+            text = font.render(("GAME OVER"), 1, WHITE)
+            screen.blit(text, (900, 500))
 
-        # Displays "YOU WIN" on the end screen below "GAME OVER" - signifying you died
-        font = pygame.font.Font('freesansbold.ttf', 30)
-        text = font.render(("YOU WIN"), 1, WHITE)
-        screen.blit(text, (900, 540))
+            # Displays "YOU WIN" on the end screen below "GAME OVER" - signifying you died
+            font = pygame.font.Font('freesansbold.ttf', 30)
+            text = font.render(("YOU WIN"), 1, WHITE)
+            screen.blit(text, (900, 540))
 
-        # Displayes the player's coins in the endscreen
-        font = pygame.font.Font('freesansbold.ttf', 20)
-        text = font.render(("COINS: " + str(self.coins)), 1, WHITE)
-        screen.blit(text, (900, 580))
+            # Displayes the player's coins in the endscreen
+            font = pygame.font.Font('freesansbold.ttf', 20)
+            text = font.render(("COINS: " + str(self.coins)), 1, WHITE)
+            screen.blit(text, (900, 580))
 
-        # Updates the screen
-        pygame.display.flip()
+            # Updates the screen
+            pygame.display.flip()
 
-        pygame.time.wait(30000) # The program pauses every (to stop the screen being updated again by the game.display() method - so that the endscreen is kept there) for 30 seconds (30000 milliseconds) and then the program closes
-
-        pygame.quit() 
+            #pygame.time.wait(30000) # The program pauses every (to stop the screen being updated again by the game.display() method - so that the endscreen is kept there) for 30 seconds (30000 milliseconds) and then the program closes
 
 # STAYS OUTSIDE OF ANY CLASS
 game = Game()
