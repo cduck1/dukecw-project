@@ -2,6 +2,7 @@ import pygame
 import random
 import time
 import math
+import shelve
 
 # Defining colours
 BLACK = (0,0,0)
@@ -56,6 +57,7 @@ def mainmenu():
         pygame.display.flip()
         clock.tick(60)
 
+# The method for buttons
 def button_1(msg1,xb1,yb1,wb1,hb1,icb1,acb1,action1=None): #msg1 = the message inside the button, xb1 = x coords of button, yb1 = y coords, wb1 = width, hb1 = height, icb1 = inactive colour, acb1 = active colour, action = the output when button is pressed
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
@@ -536,11 +538,7 @@ def gameloop():
             self.rect = self.image.get_rect()
             self.rect.x = x
             self.rect.y = y
-            # Variables
         
-        def update(self):
-            pass
-
     # This is the actual hammer that the player weilds and does damage with (for level 10)
     class hammer(pygame.sprite.Sprite):
         # Define the constructor for the wall class
@@ -758,7 +756,10 @@ def gameloop():
             # Variables
             self.level = 1
             self.lives = 3 # We refer to the game for the lives of the player as this allows the lives to be continued from level to level - the lives do not reset back to 3 every time you go to the next level
-            self.coins = 0
+            # We get the variable "self.coins" from the file "coins.txt"
+            d = shelve.open('coins.txt') 
+            self.coins = d['coins']
+            d.close()
             self.hammerspawned = False # Ensures only one hammer is spawned every three seconds
             self.endscreen = False # This is used to stop the barrels from spawning during the youlose screen and to stop previous text front being drawn again
             self.youlose = False
@@ -1279,6 +1280,10 @@ def gameloop():
                 screen.blit(text, text_rect)
 
                 button_1("MAIN MENU",840,475,250,60,WHITE,GREY,"4") # This button take you to the main menu
+                # Saves the self.coins onto the text file when the game is closed
+                d = shelve.open('coins.txt') 
+                d['coins'] = self.coins
+                d.close()
 
                 # Updates the screen
                 pygame.display.flip()
@@ -1312,6 +1317,11 @@ def gameloop():
 
                 button_1("MAIN MENU",840,475,250,60,WHITE,GREY,"4") # This button take you to the main menu
 
+                # Saves the self.coins onto the text file when the game is closed
+                d = shelve.open('coins.txt') 
+                d['coins'] = self.coins
+                d.close()
+                
                 # Updates the screen
                 pygame.display.flip()
 
