@@ -2,7 +2,7 @@ import pygame
 import random
 import time
 import math
-import shelve
+from os import path
 
 # Defining colours
 BLACK = (0,0,0)
@@ -756,10 +756,8 @@ def gameloop():
             # Variables
             self.level = 1
             self.lives = 3 # We refer to the game for the lives of the player as this allows the lives to be continued from level to level - the lives do not reset back to 3 every time you go to the next level
-            # We get the variable "self.coins" from the file "coins.txt"
-            d = shelve.open('coins.txt') 
-            self.coins = d['coins']
-            d.close()
+            self.loadcoins()
+
             self.hammerspawned = False # Ensures only one hammer is spawned every three seconds
             self.endscreen = False # This is used to stop the barrels from spawning during the youlose screen and to stop previous text front being drawn again
             self.youlose = False
@@ -1044,6 +1042,17 @@ def gameloop():
             # Calls the method levelsetup() so to build the map - this is still in the __init__() function
             self.levelsetup()
 
+        def loadcoins(self):
+            # We get the variable "self.coins" from the file "coins.txt"
+            self.coins = 0
+            # Try to read the high score from a file
+            try:
+                coins_file = open("coins.txt", "r")
+                self.coins = int(coins_file.read())
+                coins_file.close()
+            except:
+                self.coins = 0            
+
         def update(self):
             self.spawnbarrels()
             self.spawnhammerpickup()
@@ -1280,10 +1289,15 @@ def gameloop():
                 screen.blit(text, text_rect)
 
                 button_1("MAIN MENU",840,475,250,60,WHITE,GREY,"4") # This button take you to the main menu
-                # Saves the self.coins onto the text file when the game is closed
-                d = shelve.open('coins.txt') 
-                d['coins'] = self.coins
-                d.close()
+                # Save the new value for coins to the text file
+                try:
+                    # Write the file to disk
+                    coins_file = open("coins.txt", "w")
+                    coins_file.write(str(self.coins))
+                    coins_file.close()
+                except:
+                    # Can't write it
+                    print("Unable to save the high score.")
 
                 # Updates the screen
                 pygame.display.flip()
@@ -1317,10 +1331,15 @@ def gameloop():
 
                 button_1("MAIN MENU",840,475,250,60,WHITE,GREY,"4") # This button take you to the main menu
 
-                # Saves the self.coins onto the text file when the game is closed
-                d = shelve.open('coins.txt') 
-                d['coins'] = self.coins
-                d.close()
+                # Save the new value for coins to the text file
+                try:
+                    # Write the file to disk
+                    coins_file = open("coins.txt", "w")
+                    coins_file.write(str(self.coins))
+                    coins_file.close()
+                except:
+                    # Can't write it
+                    print("Unable to save the high score.")
                 
                 # Updates the screen
                 pygame.display.flip()
