@@ -712,12 +712,20 @@ def gameloop():
         # Define the constructor for the wall class
         def __init__(self, color, width, height, x, y):
             super().__init__()
-            # Create a sprite and fill it with a the image
-            self.image = pygame.Surface([width,height])
-            self.image.fill(color)
+            # Create a sprite and fill it with a the image - we have an array as this allows for 'animations'
+            self.allimages = [pygame.image.load('goldCoin1.PNG'),pygame.image.load('goldCoin2.PNG'),pygame.image.load('goldCoin3.PNG'),pygame.image.load('goldCoin4.PNG'),pygame.image.load('goldCoin5.PNG'),pygame.image.load('goldCoin6.PNG'),pygame.image.load('goldCoin7.PNG'),pygame.image.load('goldCoin8.PNG'),pygame.image.load('goldCoin9.PNG')]
+            self.currentimage = 0 # The start variable for the array image
+            self.image = self.allimages[self.currentimage]
             self.rect = self.image.get_rect()
             self.rect.x = x
             self.rect.y = y
+        def update(self):
+            # Updates the current image to the next image in the array (for animations) - if self.currentimage = 10, we restart the array from image number 0
+            self.currentimage += 1
+            if self.currentimage >= len(self.allimages):
+                self.currentimage = 0
+            self.image = self.allimages[self.currentimage]
+            
 
     # Game class
     class Game(object):
@@ -1227,7 +1235,7 @@ def gameloop():
                     self.all_sprites_group.add(self.myBarreldeathwall)
                 # 8s in the array represent coins
                 if self.levelselected[i] == 8:
-                    self.myCoin = coins(GOLD,10,10,temp_x+15,temp_y+25) # The + values on the temp_x and temp_y are to centre and ensure the coin is on the ground (actually slightly off the ground because this makes it look cooler)
+                    self.myCoin = coins(GOLD,10,10,temp_x+4,temp_y+4) # The + values on the temp_x and temp_y are to centre and ensure the coin is on the ground (actually slightly off the ground because this makes it look cooler)
                     self.coin_group.add(self.myCoin)
                     self.background_group.add(self.myCoin)
                     self.all_sprites_group.add(self.myCoin)
