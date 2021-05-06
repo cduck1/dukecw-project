@@ -573,16 +573,22 @@ def gameloop():
         def __init__(self, color, width, height, x, y):
             super().__init__()
             # Create a sprite and fill it with a the image
-            self.image = pygame.Surface([width,height])
-            self.image.fill(color)
+            self.image = pygame.image.load('outerwallpiece.PNG')
             self.rect = self.image.get_rect()
             self.rect.x = x
             self.rect.y = y
 
-    # Innerwall class (basically the construction bars that player runs along) - inherits everything from the outerwall class
-    class innerwall(outerwall):
-        pass
-
+    # Innerwall class (basically the construction bars that player runs along) - inherits everything from the outerwall class apart from the image which is overridden
+    class innerwall(pygame.sprite.Sprite):
+        # Define the constructor for the wall class
+        def __init__(self, color, width, height, x, y):
+            super().__init__()
+            # Create a sprite and fill it with a the image
+            self.image = pygame.image.load('constructionpiece.PNG')
+            self.rect = self.image.get_rect()
+            self.rect.x = x
+            self.rect.y = y
+ 
     class barreldeathwall(outerwall):
         pass
 
@@ -592,8 +598,7 @@ def gameloop():
         def __init__(self, color, width, height, x, y):
             super().__init__()
             # Create a sprite and fill it with a the image
-            self.image = pygame.Surface([width,height])
-            self.image.fill(color)
+            self.image = pygame.image.load('ladderpiece.PNG')
             self.rect = self.image.get_rect()
             self.rect.x = x
             self.rect.y = y
@@ -616,8 +621,12 @@ def gameloop():
         def __init__(self, color, width, height, x, y):
             super().__init__()
             # Create a sprite and fill it with a the image
-            self.image = pygame.Surface([width,height])
-            self.image.fill(color)
+            # Create a sprite and fill it with a the image - we have an array as this allows for 'animations'
+            self.spinleft = [pygame.image.load('barrel8.PNG'),pygame.image.load('barrel7.PNG'),pygame.image.load('barrel6.PNG'),pygame.image.load('barrel5.PNG'),pygame.image.load('barrel4.PNG'),pygame.image.load('barrel3.PNG'),pygame.image.load('barrel2.PNG'),pygame.image.load('barrel1.PNG'),pygame.image.load('barrel0.PNG')]
+            self.spinright = [pygame.image.load('barrel0.PNG'),pygame.image.load('barrel1.PNG'),pygame.image.load('barrel2.PNG'),pygame.image.load('barrel3.PNG'),pygame.image.load('barrel4.PNG'),pygame.image.load('barrel5.PNG'),pygame.image.load('barrel6.PNG'),pygame.image.load('barrel7.PNG'),pygame.image.load('barrel8.PNG')]
+            self.currentleftimage = 0 # The start variable for the array image
+            self.currentrightimage = 0
+            self.image = pygame.image.load('barrel0.PNG') # This is the start image for the barrel
             self.rect = self.image.get_rect()
             self.rect.x = x
             self.rect.y = y
@@ -630,6 +639,7 @@ def gameloop():
             self.goright = False
             self.movex = False # the default value for allowing the barrel to move left or right is false - this is changed to true when the barrel touches the floor
             self.midairchoose = True # The barrel spawns in mid air chooses whether the barrel goes left or right
+            self.animationcounter = 0 # A counter used ot slow down the speed at which the coin spins
 
         def update(self):
             self.barrelgravity()
@@ -677,10 +687,12 @@ def gameloop():
                 # If goleft = True, go left
                 if self.goleft == True:
                     self.changespeedbarrel(-1, 0)
+                    self.animateleft()
 
                 # If goright = True, go right
                 if self.goright == True:
                     self.changespeedbarrel(1, 0)
+                    self.animateright()
 
             # Reset the barrel's ability to move left or right to false every update function so that if in mid air, the barrel cannot move left or right
             self.movex = False
@@ -703,6 +715,22 @@ def gameloop():
             # Move the player up/down
             self.rect.y += self.change_y
         
+        def animateleft(self):
+            if self.goleft == True and self.goright == False:
+                # Updates the current image to the next image in the array (for animations) - if self.currentimage = 10, we restart the array from image number 0. It only does this every 6 ticks because otherwise it spins really (too) fast
+                self.currentleftimage += 1
+                if self.currentleftimage >= len(self.spinleft):
+                    self.currentleftimage = 0
+                self.image = self.spinleft[self.currentleftimage]
+
+        def animateright(self):
+            if self.goright == True and self.goleft == False:
+                # Updates the current image to the next image in the array (for animations) - if self.currentimage = 10, we restart the array from image number 0. It only does this every 6 ticks because otherwise it spins really (too) fast
+                self.currentrightimage += 1
+                if self.currentrightimage >= len(self.spinright):
+                    self.currentrightimage = 0
+                self.image = self.spinright[self.currentrightimage]
+        
         def die(self):
             if pygame.sprite.spritecollide(self,game.barreldeathwall_group, False):
                 self.kill()
@@ -719,14 +747,17 @@ def gameloop():
             self.rect = self.image.get_rect()
             self.rect.x = x
             self.rect.y = y
+            # Variables
+            self.animationcounter = 0 # A counter used ot slow down the speed at which the coin spins
         def update(self):
-            # Updates the current image to the next image in the array (for animations) - if self.currentimage = 10, we restart the array from image number 0
-            self.currentimage += 1
-            if self.currentimage >= len(self.allimages):
-                self.currentimage = 0
-            self.image = self.allimages[self.currentimage]
+            # Updates the current image to the next image in the array (for animations) - if self.currentimage = 10, we restart the array from image number 0. It only does this every 6 ticks because otherwise it spins really (too) fast
+            if self.animationcounter % 6 == 0:
+                self.currentimage += 1
+                if self.currentimage >= len(self.allimages):
+                    self.currentimage = 0
+                self.image = self.allimages[self.currentimage]
+            self.animationcounter += 1
             
-
     # Game class
     class Game(object):
         def __init__(self):
@@ -1069,7 +1100,7 @@ def gameloop():
             if (self.level < 10) and (self.endscreen == False):
                 now = pygame.time.get_ticks()
                 if now - self.start > 3000: # 3000 milliseconds is 3 seconds
-                    self.myBarrel = barrel(BROWN, 20, 20, self.barrelspawncoordx, self.barrelspawncoordy)
+                    self.myBarrel = barrel(BROWN, 19, 19, self.barrelspawncoordx, self.barrelspawncoordy)
                     # Add the barrel to a barrel group and an all sprites group
                     self.barrel_group.add(self.myBarrel)
                     self.moving_sprites_group.add(self.myBarrel)
@@ -1218,7 +1249,7 @@ def gameloop():
                     self.all_sprites_group.add(self.myPortal)
                 # 6s in the array represent barrels
                 if self.levelselected[i] == 6:
-                    self.myBarrel = barrel(BROWN, 20, 20, temp_x+10, temp_y+10) # The + values are to centre the barrels within that 40x40 block
+                    self.myBarrel = barrel(BROWN, 19, 19, temp_x+10, temp_y+10) # The + values are to centre the barrels within that 40x40 block
                     # Add the barrel to a barrel group and an all sprites group
                     self.barrel_group.add(self.myBarrel)
                     self.moving_sprites_group.add(self.myBarrel)
