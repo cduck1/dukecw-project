@@ -98,8 +98,8 @@ def gameloop():
             # Call the super class (the super class for the player is sprite)
             super().__init__()
             # Set the position of the sprite
-            self.image = pygame.Surface([width,height])
-            self.image.fill(color)
+            self.image = pygame.image.load('mario1.PNG')
+            self.currentrightimage = 0 # The start variable for the array image
             self.rect = self.image.get_rect()
             self.rect.x = x
             self.rect.y = y
@@ -109,8 +109,10 @@ def gameloop():
             # Flags
             self.isJump = False
             self.gravity = True
+            self.moveright = False
+            self.moveleft = False
             # Variables
-            self.startjumptime = 0    
+            self.startjumptime = 0
 
         def update(self):
             # PLAYER MOVEMENT
@@ -129,8 +131,12 @@ def gameloop():
             # Standard left/right movement of the player
             if keys[pygame.K_LEFT]:
                 self.changespeed(-5, 0)
+                self.moveleft = True
+                self.moveright = False
             if keys[pygame.K_RIGHT]:
                 self.changespeed(5, 0)
+                self.moveright = True
+                self.moveleft = False
 
             # Made this code functions because it cleans up the previously cluttered update function significantly
             self.die()
@@ -141,10 +147,13 @@ def gameloop():
             self.barrelhit()
             self.coinhit()
             self.portalhit()
+            self.animateright()
 
             # Resets the speed change to 0 every update so that the speed doesn't accelerate infinitely
             self.change_x = 0
             self.change_y = 0
+            self.moveright = False
+            self.moveleft = False
 
         # Change the x and y speed of the player
         def changespeed(self, x, y):
@@ -225,6 +234,14 @@ def gameloop():
                 game.coins += 2 # You gain 2 coins when you finish each level
                 game.clearlevel() # Clear the level
                 game.levelsetup() # And set the level up again
+
+        def animateright(self):
+            if self.moveright == True and self.moveleft == False:
+                # Updates the current image to the next image in the array (for animations) - if self.currentimage = 10, we restart the array from image number 0. It only does this every 6 ticks because otherwise it spins really (too) fast
+                self.currentrightimage += 1
+                if self.currentrightimage >= len(Game.mariorunright):
+                    self.currentrightimage = 0
+                self.image = Game.mariorunright[self.currentrightimage]
 
     # This is the player but in the arena - we have a different class for this player because it allows us to change the players movement along with many other things (e.g: no jumping, and no need for if statement before every difference between the two players checking whether it is level 10 yet or not)
     class arenaplayer(pygame.sprite.Sprite):
@@ -621,11 +638,8 @@ def gameloop():
         def __init__(self, color, width, height, x, y):
             super().__init__()
             # Create a sprite and fill it with a the image
-            # Create a sprite and fill it with a the image - we have an array as this allows for 'animations'
-            self.spinleft = [pygame.image.load('barrel8.PNG'),pygame.image.load('barrel7.PNG'),pygame.image.load('barrel6.PNG'),pygame.image.load('barrel5.PNG'),pygame.image.load('barrel4.PNG'),pygame.image.load('barrel3.PNG'),pygame.image.load('barrel2.PNG'),pygame.image.load('barrel1.PNG'),pygame.image.load('barrel0.PNG')]
-            self.spinright = [pygame.image.load('barrel0.PNG'),pygame.image.load('barrel1.PNG'),pygame.image.load('barrel2.PNG'),pygame.image.load('barrel3.PNG'),pygame.image.load('barrel4.PNG'),pygame.image.load('barrel5.PNG'),pygame.image.load('barrel6.PNG'),pygame.image.load('barrel7.PNG'),pygame.image.load('barrel8.PNG')]
-            self.currentleftimage = 0 # The start variable for the array image
-            self.currentrightimage = 0
+            self.currentleftimage = 0 # The start variable for the array of left rolling images
+            self.currentrightimage = 0 
             self.image = pygame.image.load('barrel0.PNG') # This is the start image for the barrel
             self.rect = self.image.get_rect()
             self.rect.x = x
@@ -719,17 +733,17 @@ def gameloop():
             if self.goleft == True and self.goright == False:
                 # Updates the current image to the next image in the array (for animations) - if self.currentimage = 10, we restart the array from image number 0. It only does this every 6 ticks because otherwise it spins really (too) fast
                 self.currentleftimage += 1
-                if self.currentleftimage >= len(self.spinleft):
+                if self.currentleftimage >= len(Game.spinleft):
                     self.currentleftimage = 0
-                self.image = self.spinleft[self.currentleftimage]
+                self.image = Game.spinleft[self.currentleftimage]
 
         def animateright(self):
             if self.goright == True and self.goleft == False:
                 # Updates the current image to the next image in the array (for animations) - if self.currentimage = 10, we restart the array from image number 0. It only does this every 6 ticks because otherwise it spins really (too) fast
                 self.currentrightimage += 1
-                if self.currentrightimage >= len(self.spinright):
+                if self.currentrightimage >= len(Game.spinright):
                     self.currentrightimage = 0
-                self.image = self.spinright[self.currentrightimage]
+                self.image = Game.spinright[self.currentrightimage]
         
         def die(self):
             if pygame.sprite.spritecollide(self,game.barreldeathwall_group, False):
@@ -740,10 +754,8 @@ def gameloop():
         # Define the constructor for the wall class
         def __init__(self, color, width, height, x, y):
             super().__init__()
-            # Create a sprite and fill it with a the image - we have an array as this allows for 'animations'
-            self.allimages = [pygame.image.load('goldCoin1.PNG'),pygame.image.load('goldCoin2.PNG'),pygame.image.load('goldCoin3.PNG'),pygame.image.load('goldCoin4.PNG'),pygame.image.load('goldCoin5.PNG'),pygame.image.load('goldCoin6.PNG'),pygame.image.load('goldCoin7.PNG'),pygame.image.load('goldCoin8.PNG'),pygame.image.load('goldCoin9.PNG')]
             self.currentimage = 0 # The start variable for the array image
-            self.image = self.allimages[self.currentimage]
+            self.image = Game.allcoinimages[self.currentimage]
             self.rect = self.image.get_rect()
             self.rect.x = x
             self.rect.y = y
@@ -753,9 +765,9 @@ def gameloop():
             # Updates the current image to the next image in the array (for animations) - if self.currentimage = 10, we restart the array from image number 0. It only does this every 6 ticks because otherwise it spins really (too) fast
             if self.animationcounter % 6 == 0:
                 self.currentimage += 1
-                if self.currentimage >= len(self.allimages):
+                if self.currentimage >= len(Game.allcoinimages):
                     self.currentimage = 0
-                self.image = self.allimages[self.currentimage]
+                self.image = Game.allcoinimages[self.currentimage]
             self.animationcounter += 1
             
     # Game class
@@ -791,6 +803,13 @@ def gameloop():
             self.start = pygame.time.get_ticks()
             # This is the start timer which allows the hammer to spawn every 30 seconds
             self.starttimer = pygame.time.get_ticks()
+
+            # Loads all the images at the start of the game, instead of loading every image needed every tick which is very inefficient - we use captial "G" in "Game" because we are making a static variable, not an attribute of an object - I have only done this for the objects being animated as the other objects won't make a big difference
+            # Create a sprite and fill it with a the image - we have an array as this allows for 'animations'
+            Game.allcoinimages = [pygame.image.load('goldCoin1.PNG'),pygame.image.load('goldCoin2.PNG'),pygame.image.load('goldCoin3.PNG'),pygame.image.load('goldCoin4.PNG'),pygame.image.load('goldCoin5.PNG'),pygame.image.load('goldCoin6.PNG'),pygame.image.load('goldCoin7.PNG'),pygame.image.load('goldCoin8.PNG'),pygame.image.load('goldCoin9.PNG')]
+            Game.spinleft = [pygame.image.load('barrel8.PNG'),pygame.image.load('barrel7.PNG'),pygame.image.load('barrel6.PNG'),pygame.image.load('barrel5.PNG'),pygame.image.load('barrel4.PNG'),pygame.image.load('barrel3.PNG'),pygame.image.load('barrel2.PNG'),pygame.image.load('barrel1.PNG'),pygame.image.load('barrel0.PNG')]
+            Game.spinright = [pygame.image.load('barrel0.PNG'),pygame.image.load('barrel1.PNG'),pygame.image.load('barrel2.PNG'),pygame.image.load('barrel3.PNG'),pygame.image.load('barrel4.PNG'),pygame.image.load('barrel5.PNG'),pygame.image.load('barrel6.PNG'),pygame.image.load('barrel7.PNG'),pygame.image.load('barrel8.PNG')]
+            Game.mariorunright = [pygame.image.load('mario2.PNG'),pygame.image.load('mario3.PNG'),pygame.image.load('mario4.PNG'),pygame.image.load('mario5.PNG')]
 
             # Variables
             self.level = 1
