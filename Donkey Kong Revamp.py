@@ -58,7 +58,7 @@ def mainmenu():
         clock.tick(60)
 
 # The method for buttons
-def button_1(msg1,xb1,yb1,wb1,hb1,icb1,acb1,action1=None): #msg1 = the message inside the button, xb1 = x coords of button, yb1 = y coords, wb1 = width, hb1 = height, icb1 = inactive colour, acb1 = active colour, action = the output when button is pressed
+def button_1(msg1,xb1,yb1,wb1,hb1,icb1,acb1,action1=None): # msg1 = the message inside the button, xb1 = x coords of button, yb1 = y coords, wb1 = width, hb1 = height, icb1 = inactive colour, acb1 = active colour, action = the output when button is pressed
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
     if xb1+wb1 >mouse[0] > xb1 and yb1+hb1 > mouse[1] > yb1:
@@ -98,7 +98,7 @@ def gameloop():
             # Call the super class (the super class for the player is sprite)
             super().__init__()
             # Set the position of the sprite
-            self.image = pygame.image.load('mario1.PNG')
+            self.image = pygame.image.load('mario1.PNG').convert()
             self.currentrightimage = 0 # The start variable for the array image
             self.rect = self.image.get_rect()
             self.rect.x = x
@@ -113,6 +113,9 @@ def gameloop():
             self.moveleft = False
             # Variables
             self.startjumptime = 0
+            self.animationcounter = 0
+            self.startposx = 0
+            self.startposy = 0
 
         def update(self):
             # PLAYER MOVEMENT
@@ -220,6 +223,9 @@ def gameloop():
         def barrelhit(self):
             if pygame.sprite.spritecollide(self, game.barrel_group, True):
                 game.lives -= 1
+                # Mario starts from the beginning of the level
+                self.rect.x = game.startposx
+                self.rect.y = game.startposy
                 print("Lives: ", int(game.lives))
 
         def coinhit(self):
@@ -236,12 +242,14 @@ def gameloop():
                 game.levelsetup() # And set the level up again
 
         def animateright(self):
-            if self.moveright == True and self.moveleft == False:
-                # Updates the current image to the next image in the array (for animations) - if self.currentimage = 10, we restart the array from image number 0. It only does this every 6 ticks because otherwise it spins really (too) fast
-                self.currentrightimage += 1
-                if self.currentrightimage >= len(Game.mariorunright):
-                    self.currentrightimage = 0
-                self.image = Game.mariorunright[self.currentrightimage]
+            if self.animationcounter % 6 == 0: # Slows down the animation
+                if self.moveright == True and self.moveleft == False:
+                    # Updates the current image to the next image in the array (for animations) - if self.currentimage = 10, we restart the array from image number 0. It only does this every 6 ticks because otherwise it spins really (too) fast
+                    self.currentrightimage += 1
+                    if self.currentrightimage >= len(Game.mariorunright):
+                        self.currentrightimage = 0
+                    self.image = Game.mariorunright[self.currentrightimage]
+            self.animationcounter += 1
 
     # This is the player but in the arena - we have a different class for this player because it allows us to change the players movement along with many other things (e.g: no jumping, and no need for if statement before every difference between the two players checking whether it is level 10 yet or not)
     class arenaplayer(pygame.sprite.Sprite):
@@ -762,6 +770,9 @@ def gameloop():
             # Variables
             self.animationcounter = 0 # A counter used ot slow down the speed at which the coin spins
         def update(self):
+            self.animate()
+
+        def animate(self):
             # Updates the current image to the next image in the array (for animations) - if self.currentimage = 10, we restart the array from image number 0. It only does this every 6 ticks because otherwise it spins really (too) fast
             if self.animationcounter % 6 == 0:
                 self.currentimage += 1
@@ -815,6 +826,8 @@ def gameloop():
             self.level = 1
             self.lives = 3 # We refer to the game for the lives of the player as this allows the lives to be continued from level to level - the lives do not reset back to 3 every time you go to the next level
             self.loadcoins()
+            self.startposx = 0
+            self.startposy = 0
 
             self.hammerspawned = False # Ensures only one hammer is spawned every three seconds
             self.endscreen = False # This is used to stop the barrels from spawning during the youlose screen and to stop previous text front being drawn again
@@ -1129,7 +1142,7 @@ def gameloop():
         def spawnhammerpickup(self):
             if self.level == 10:
                 now = pygame.time.get_ticks()
-                if now - self.starttimer > 3000: # 3000 milliseconds is 3 seconds
+                if now - self.starttimer > 5000: # 5000 milliseconds is 5 seconds
                     self.hammerspawned = False
                     self.starttimer = now
                     for i in range (0,1200):
@@ -1252,6 +1265,8 @@ def gameloop():
                     self.player_group.add(self.myPlayer)
                     self.moving_sprites_group.add(self.myPlayer)
                     self.all_sprites_group.add(self.myPlayer)
+                    self.startposx = temp_x
+                    self.startposy = temp_y
                 # 4s in the array represent the ladders
                 if self.levelselected[i] == 4:
                     self.myLadder = ladder(YELLOW, 40, 40,temp_x, temp_y-1) # The reason for the temp_y-1 is so that when the player moves across the top of a ladder, then dont start moving down and then get stuck and gravity is off the whole way across with it like this
