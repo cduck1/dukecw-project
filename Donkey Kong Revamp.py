@@ -180,7 +180,7 @@ def gameloop():
             if self.isJump == True:
                 airtime = nowtime - self.startjumptime
                 if airtime < 180:
-                    self.changespeed(0,-6) # Go up 4 pixels each update function (each time jumpingtrigger method is called) - gives a smoother jump motion and gravity brings the player back down. This must be -4 because gravity = +3 every update function so the total movement upwards is 1 pixel a update function
+                    self.changespeed(0,-6)
                     nowtime = pygame.time.get_ticks()
 
         def gravityon(self):
@@ -440,7 +440,7 @@ def gameloop():
             # Move donkey kong left/right
             self.rect.x += self.change_x
 
-            # Making sure we don't go through donkey kong
+            # Making sure the player doesn't go through donkey kong
             if (pygame.sprite.spritecollide(self,game.arenaplayer_group,False)):
                 self.startpause = pygame.time.get_ticks()
                 self.isMove = False
@@ -1115,14 +1115,15 @@ def gameloop():
 
         def loadcoins(self):
             # We get the variable "self.coins" from the file "coins.txt"
-            self.coins = 0
+            self.coins = 0 # Initiates the variable
             # Try to read the high score from a file
             try:
-                coins_file = open("coins.txt", "r")
-                self.coins = int(coins_file.read())
-                coins_file.close()
+                coins_file = open("coins.txt", "r") # Reads the text file and saves it to the coins_file variable
+                self.coins = int(coins_file.read()) # saves the number read from the text file to the coins variable
+                coins_file.close() # closes the coins variable
             except:
-                self.coins = 0            
+                # If there is some kind of error, set the coins variable to 0
+                self.coins = 0
 
         def update(self):
             self.spawnbarrels()
