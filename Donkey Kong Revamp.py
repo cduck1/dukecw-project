@@ -99,6 +99,7 @@ def gameloop():
             super().__init__()
             # Set the position of the sprite
             self.image = pygame.image.load('mario1.PNG').convert()
+            self.currentleftimage = 0 # The start variable for the array image
             self.currentrightimage = 0 # The start variable for the array image
             self.rect = self.image.get_rect()
             self.rect.x = x
@@ -150,6 +151,7 @@ def gameloop():
             self.barrelhit()
             self.coinhit()
             self.portalhit()
+            self.animateleft()
             self.animateright()
 
             # Resets the speed change to 0 every update so that the speed doesn't accelerate infinitely
@@ -240,6 +242,15 @@ def gameloop():
                 game.coins += 2 # You gain 2 coins when you finish each level
                 game.clearlevel() # Clear the level
                 game.levelsetup() # And set the level up again
+
+        def animateleft(self):
+            if self.animationcounter % 6 == 0:
+                if self.moveleft == True and self.moveright == False:
+                    self.currentleftimage += 1
+                    if self.currentleftimage>= len(Game.mariorunleft):
+                        self.currentleftimage = 0
+                    self.image = Game.mariorunleft[self.currentleftimage]
+            self.animationcounter += 1
 
         def animateright(self):
             if self.animationcounter % 6 == 0: # Slows down the animation
@@ -820,6 +831,7 @@ def gameloop():
             Game.allcoinimages = [pygame.image.load('goldCoin1.PNG'),pygame.image.load('goldCoin2.PNG'),pygame.image.load('goldCoin3.PNG'),pygame.image.load('goldCoin4.PNG'),pygame.image.load('goldCoin5.PNG'),pygame.image.load('goldCoin6.PNG'),pygame.image.load('goldCoin7.PNG'),pygame.image.load('goldCoin8.PNG'),pygame.image.load('goldCoin9.PNG')]
             Game.spinleft = [pygame.image.load('barrel8.PNG'),pygame.image.load('barrel7.PNG'),pygame.image.load('barrel6.PNG'),pygame.image.load('barrel5.PNG'),pygame.image.load('barrel4.PNG'),pygame.image.load('barrel3.PNG'),pygame.image.load('barrel2.PNG'),pygame.image.load('barrel1.PNG'),pygame.image.load('barrel0.PNG')]
             Game.spinright = [pygame.image.load('barrel0.PNG'),pygame.image.load('barrel1.PNG'),pygame.image.load('barrel2.PNG'),pygame.image.load('barrel3.PNG'),pygame.image.load('barrel4.PNG'),pygame.image.load('barrel5.PNG'),pygame.image.load('barrel6.PNG'),pygame.image.load('barrel7.PNG'),pygame.image.load('barrel8.PNG')]
+            Game.mariorunleft = [pygame.image.load('mario2.PNG'),pygame.image.load('mario3.PNG'),pygame.image.load('mario4.PNG'),pygame.image.load('mario5.PNG')]
             Game.mariorunright = [pygame.image.load('mario2.PNG'),pygame.image.load('mario3.PNG'),pygame.image.load('mario4.PNG'),pygame.image.load('mario5.PNG')]
 
             # Variables
