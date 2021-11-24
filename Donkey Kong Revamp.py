@@ -98,7 +98,7 @@ def gameloop():
             # Call the super class (the super class for the player is sprite)
             super().__init__()
             # Set the position of the sprite
-            self.image = pygame.image.load('mario1.PNG').convert()
+            self.image = pygame.image.load('mario1nobg.PNG')
             self.currentleftimage = 0 # The start variable for the array image
             self.currentrightimage = 0 # The start variable for the array image
             self.rect = self.image.get_rect()
@@ -114,7 +114,8 @@ def gameloop():
             self.moveleft = False
             # Variables
             self.startjumptime = 0
-            self.animationcounter = 0
+            self.animationcounterleft = 0
+            self.animationcounterright = 0
             self.startposx = 0
             self.startposy = 0
 
@@ -244,23 +245,23 @@ def gameloop():
                 game.levelsetup() # And set the level up again
 
         def animateleft(self):
-            if self.animationcounter % 6 == 0:
+            if self.animationcounterleft % 6 == 0:
                 if self.moveleft == True and self.moveright == False:
                     self.currentleftimage += 1
                     if self.currentleftimage>= len(Game.mariorunleft):
                         self.currentleftimage = 0
                     self.image = Game.mariorunleft[self.currentleftimage]
-            self.animationcounter += 1
+            self.animationcounterleft += 1
 
         def animateright(self):
-            if self.animationcounter % 6 == 0: # Slows down the animation
+            if self.animationcounterright % 6 == 0: # Slows down the animation
                 if self.moveright == True and self.moveleft == False:
                     # Updates the current image to the next image in the array (for animations) - if self.currentimage = 10, we restart the array from image number 0. It only does this every 6 ticks because otherwise it spins really (too) fast
                     self.currentrightimage += 1
                     if self.currentrightimage >= len(Game.mariorunright):
                         self.currentrightimage = 0
                     self.image = Game.mariorunright[self.currentrightimage]
-            self.animationcounter += 1
+            self.animationcounterright += 1
 
     # This is the player but in the arena - we have a different class for this player because it allows us to change the players movement along with many other things (e.g: no jumping, and no need for if statement before every difference between the two players checking whether it is level 10 yet or not)
     class arenaplayer(pygame.sprite.Sprite):
@@ -831,8 +832,8 @@ def gameloop():
             Game.allcoinimages = [pygame.image.load('goldCoin1.PNG'),pygame.image.load('goldCoin2.PNG'),pygame.image.load('goldCoin3.PNG'),pygame.image.load('goldCoin4.PNG'),pygame.image.load('goldCoin5.PNG'),pygame.image.load('goldCoin6.PNG'),pygame.image.load('goldCoin7.PNG'),pygame.image.load('goldCoin8.PNG'),pygame.image.load('goldCoin9.PNG')]
             Game.spinleft = [pygame.image.load('barrel8.PNG'),pygame.image.load('barrel7.PNG'),pygame.image.load('barrel6.PNG'),pygame.image.load('barrel5.PNG'),pygame.image.load('barrel4.PNG'),pygame.image.load('barrel3.PNG'),pygame.image.load('barrel2.PNG'),pygame.image.load('barrel1.PNG'),pygame.image.load('barrel0.PNG')]
             Game.spinright = [pygame.image.load('barrel0.PNG'),pygame.image.load('barrel1.PNG'),pygame.image.load('barrel2.PNG'),pygame.image.load('barrel3.PNG'),pygame.image.load('barrel4.PNG'),pygame.image.load('barrel5.PNG'),pygame.image.load('barrel6.PNG'),pygame.image.load('barrel7.PNG'),pygame.image.load('barrel8.PNG')]
-            Game.mariorunleft = [pygame.image.load('mario2.PNG'),pygame.image.load('mario3.PNG'),pygame.image.load('mario4.PNG'),pygame.image.load('mario5.PNG')]
-            Game.mariorunright = [pygame.image.load('mario2.PNG'),pygame.image.load('mario3.PNG'),pygame.image.load('mario4.PNG'),pygame.image.load('mario5.PNG')]
+            Game.mariorunleft = [pygame.image.load('mario2nobgleft.PNG'),pygame.image.load('mario3nobgleft.PNG'),pygame.image.load('mario4nobgleft.PNG'),pygame.image.load('mario5nobgleft.PNG')]
+            Game.mariorunright = [pygame.image.load('mario2nobg.PNG'),pygame.image.load('mario3nobg.PNG'),pygame.image.load('mario4nobg.PNG'),pygame.image.load('mario5nobg.PNG')]
 
             # Variables
             self.level = 1
