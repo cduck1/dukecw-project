@@ -297,12 +297,16 @@ def gameloop():
             keys = pygame.key.get_pressed()
             if keys[pygame.K_LEFT]:
                 self.changespeed(-5, 0)
+                self.animateW()
             if keys[pygame.K_RIGHT]:
                 self.changespeed(5, 0)
+                self.animateE()
             if keys[pygame.K_UP]:
                 self.changespeed(0, -5)
+                self.animateN()
             if keys[pygame.K_DOWN]:
                 self.changespeed(0, 5)
+                self.animateS()
 
             # Made this code functions because it cleans up the previously cluttered update function significantly
             self.die()
@@ -389,6 +393,23 @@ def gameloop():
                     self.myHammer.kill()
                     self.hammerpresent = False
                     self.starttime = now
+
+        def animateN(self):
+            # Changes the image of the arena player to the coresponding image that faces north in the array of images named "arenamarioimages"
+            self.image = Game.arenamarioimages[0]
+
+        def animateE(self):
+            # Changes the image of the arena player to the coresponding image that faces east in the array of images named "arenamarioimages"
+            self.image = Game.arenamarioimages[1]
+
+        def animateS(self):
+            # Changes the image of the arena player to the coresponding image that faces south in the array of images named "arenamarioimages"
+            self.image = Game.arenamarioimages[2]
+
+        def animateW(self):
+            # Changes the image of the arena player to the coresponding image that faces west in the array of images named "arenamarioimages"
+            self.image = Game.arenamarioimages[3]
+
 
     # The donkey kong class - used in the boss fight at level 10
     class donkeykong(pygame.sprite.Sprite):
@@ -834,6 +855,7 @@ def gameloop():
             Game.spinright = [pygame.image.load('barrel0.PNG'),pygame.image.load('barrel1.PNG'),pygame.image.load('barrel2.PNG'),pygame.image.load('barrel3.PNG'),pygame.image.load('barrel4.PNG'),pygame.image.load('barrel5.PNG'),pygame.image.load('barrel6.PNG'),pygame.image.load('barrel7.PNG'),pygame.image.load('barrel8.PNG')]
             Game.mariorunleft = [pygame.image.load('mario2nobgleft.PNG'),pygame.image.load('mario3nobgleft.PNG'),pygame.image.load('mario4nobgleft.PNG'),pygame.image.load('mario5nobgleft.PNG')]
             Game.mariorunright = [pygame.image.load('mario2nobg.PNG'),pygame.image.load('mario3nobg.PNG'),pygame.image.load('mario4nobg.PNG'),pygame.image.load('mario5nobg.PNG')]
+            Game.arenamarioimages = [pygame.image.load('mariotopdownN.PNG'),pygame.image.load('mariotopdownE.PNG'),pygame.image.load('mariotopdownS.PNG'),pygame.image.load('mariotopdownW.PNG')]
 
             # Variables
             self.level = 10
