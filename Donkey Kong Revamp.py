@@ -361,7 +361,7 @@ def gameloop():
             
         def hammerpickuphit(self):
             if pygame.sprite.spritecollide(self, game.hammerpickup_group, True):
-                self.hammerswings += 5 # When you pick up the hammerpickup, you gain 5 hits with the hammer
+                self.hammerswings += 3 # When you pick up the hammerpickup, you gain 5 hits with the hammer
 
         # Is responsible for a cooldown meaning the hammer can only be swung once every 2 seconds
         def hammercooldown(self):
@@ -836,7 +836,7 @@ def gameloop():
             Game.mariorunright = [pygame.image.load('mario2nobg.PNG'),pygame.image.load('mario3nobg.PNG'),pygame.image.load('mario4nobg.PNG'),pygame.image.load('mario5nobg.PNG')]
 
             # Variables
-            self.level = 1
+            self.level = 10
             self.lives = 3 # We refer to the game for the lives of the player as this allows the lives to be continued from level to level - the lives do not reset back to 3 every time you go to the next level
             self.loadcoins()
             self.startposx = 0
@@ -1176,7 +1176,7 @@ def gameloop():
                             temp_y = temp_y + 40
                         # 0s in the array represent empty space
                         if self.levelselected[i] == 0 and self.hammerspawned == False:
-                            spawnhammerpickup = random.randint(0,1000) # There is a 1 in 1000 chance of a hammerpickup spawning at each empty "tile" in the map
+                            spawnhammerpickup = random.randint(0,1400) # There is a 1 in 1000 chance of a hammerpickup spawning at each empty "tile" in the map
                             if spawnhammerpickup == 1:
                                 self.myHammerpickup = hammerpickup(PINK, 40, 40, temp_x, temp_y)
                                 self.hammerpickup_group.add(self.myHammerpickup)
