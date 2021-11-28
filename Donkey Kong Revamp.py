@@ -51,8 +51,7 @@ def mainmenu():
 
         button_1("PLAY",840,330,250,60,WHITE,GREY,"1")
         button_1("SKINS",840,410,250,60,WHITE,GREY,"2")
-        button_1("OPTIONS",840,490,250,60,WHITE,GREY,"3")
-        button_1("QUIT",840,570,250,60,WHITE,GREY,"Q")
+        button_1("QUIT",840,490,250,60,WHITE,GREY,"Q")
             
         pygame.display.flip()
         clock.tick(60)
@@ -69,9 +68,6 @@ def button_1(msg1,xb1,yb1,wb1,hb1,icb1,acb1,action1=None): # msg1 = the message 
             elif action1 == "2":
                 pass
                 # This is where the skins shop will go later on
-            elif action1 == "3":
-                pass
-                # This is where the options/ settings menu will go later
             elif action1 == "4":
                 mainmenu()
             elif action1 == "Q":
