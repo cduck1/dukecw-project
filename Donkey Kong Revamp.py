@@ -52,17 +52,18 @@ def mainmenu():
         text_rect = text.get_rect(center=(960, 250))
         screen.blit(text, text_rect)
 
-        button_1("PLAY",840,330,250,60,WHITE,GREY,"1")
-        button_1("SHOP",840,410,250,60,WHITE,GREY,"2")
-        button_1("QUIT",840,490,250,60,WHITE,GREY,"Q")
+        button_1("PLAY",840,330,250,60,WHITE,GREY,0,"1")
+        button_1("SHOP",840,410,250,60,WHITE,GREY,0,"2")
+        button_1("QUIT",840,490,250,60,WHITE,GREY,0,"Q")
             
         pygame.display.flip()
         clock.tick(60)
 
 # The method for buttons
-def button_1(msg1,xb1,yb1,wb1,hb1,icb1,acb1,action1=None): # msg1 = the message inside the button, xb1 = x coords of button, yb1 = y coords, wb1 = width, hb1 = height, icb1 = inactive colour, acb1 = active colour, action = the output when button is pressed
+def button_1(msg1,xb1,yb1,wb1,hb1,icb1,acb1,buttonpressed,action1=None): # msg1 = the message inside the button, xb1 = x coords of button, yb1 = y coords, wb1 = width, hb1 = height, icb1 = inactive colour, acb1 = active colour, action = the output when button is pressed, buttonpressed = the button that was pressed - e.g. if luigi's button was pressed it would say "luigi"
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
+    skinselected = buttonpressed # skin selected allows us to identify which skin the user clicked on and is trying to buy
     if xb1+wb1 >mouse[0] > xb1 and yb1+hb1 > mouse[1] > yb1:
         pygame.draw.rect(screen, icb1,(xb1,yb1,wb1,hb1),5)
         if click[0] == 1 and action1 !=None:
@@ -74,9 +75,11 @@ def button_1(msg1,xb1,yb1,wb1,hb1,icb1,acb1,action1=None): # msg1 = the message 
             elif action1 == "3":
                 confirmpurchase() # This calls the method that requests the user confirms their purchase for the skin
             elif action1 == "4":
-                skinpurchased() # This calls the method that removes the user's coins in exchange for the skin skins
+                skinpurchased(skinselected) # This calls the method that removes the user's coins in exchange for the skin
             elif action1 == "5":
-                pass
+                mainmenu()
+            elif action1 == "M":
+                mainmenu()
             elif action1 == "Q":
                 pygame.quit()
     else:
@@ -117,8 +120,8 @@ def shop():
 
         # Shows a preview of the skin in the shop
         # I made the button larger do I could fit in a completely unrelated (not part of the button function) piece of text that shows the price of the skin
-        screen.blit(pygame.image.load("shopluigipreview.PNG"),(330,200))
-        button_1("MARIO",330,450,250,80,WHITE,GREY,"3")
+        screen.blit(pygame.image.load("shopmariopreview.PNG"),(330,200))
+        button_1("MARIO",330,450,250,80,WHITE,GREY,1,"3")
         font = pygame.font.Font('freesansbold.ttf', 15)
         text = font.render(str("FREE - DEFAULT"), 1, WHITE)
         text_rect = text.get_rect(center=(455, 515))
@@ -126,7 +129,7 @@ def shop():
 
         # Shows a preview of the skin in the shop
         screen.blit(pygame.image.load("shopluigipreview.PNG"),(630,200))
-        button_1("LUIGI",630,450,250,80,WHITE,GREY,"3")
+        button_1("LUIGI",630,450,250,80,WHITE,GREY,2,"3")
         # This checks if luigi has already been purchased an displays a different message (already purchased/ 1000 coins) depending on that
         if luigipurchased == False:
             font = pygame.font.Font('freesansbold.ttf', 15)
@@ -138,6 +141,9 @@ def shop():
             text = font.render(str("ALREADY PURCHASED"), 1, WHITE)
             text_rect = text.get_rect(center=(755, 515))
             screen.blit(text, text_rect)
+
+        # Main menu button
+        button_1("MAIN MENU",840,850,250,60,WHITE,GREY,0,"M") # This button take you to the main menu
 
         pygame.display.flip()
         clock.tick(60)
@@ -160,18 +166,46 @@ def confirmpurchase():
         text = font.render(str("CONFIRM PURCHASE"), 1, WHITE)
         text_rect = text.get_rect(center=(960, 400))
         screen.blit(text, text_rect)
-        button_1("YES",690,450,250,60,WHITE,GREY,"4") # This button is pressed when the user is confirming the purchase for the skin they previously clicked on
-        button_1("NO",980,450,250,60,WHITE,GREY,"5") # This button is pressed when the user is declining the purchase for the skin they previously clicked on
+        button_1("YES",690,450,250,60,WHITE,GREY,0,"4") # This button is pressed when the user is confirming the purchase for the skin they previously clicked on
+        button_1("NO",980,450,250,60,WHITE,GREY,0,"5") # This button is pressed when the user is declining the purchase for the skin they previously clicked on
 
         pygame.display.flip()
         clock.tick(60)
 
 # If the user has clicked yes on confirm purchase, this method is run
-def skinpurchased():
-    if game.coins > 1000:
-        game.coins -= 1000
+def skinpurchased(skinselected):
+    # This is essentially the same as the loadcoins() method but we must recreate the loading of coins in the same method as where they are changed because of python having difficulties with passing variables by reference
+    # We get the variable "coins" from the file "coins.txt"
+    coins = 0 # Initiates the variable
+    # Try to read the high score from a file
+    try:
+        coins_file = open("coins.txt", "r") # Reads the text file and saves it to the coins_file variable
+        coins = int(coins_file.read()) # saves the number read from the text file to the coins variable
+        coins_file.close() # closes the coins variable
+    except:
+        # If there is some kind of error, set the coins variable to 0
+        coins = 0
+
+    # If the player has at least 1000 coins, they have enough money to make the purchase and the purchase is made - we minus 1000 from coins and give them access to the skin. If the player does not have enough money, this is printed in the console and they are returned to the shop
+    if coins >= 1000:
+        coins -= 1000
     else:
-        print("You do not have sufficient funds to make this purchase")
+        print("You do not have sufficient funds to make the purchase")
+        shop()
+
+    # Save the new value for coins to the text file
+    try:
+        # Write the file to disk
+        coins_file = open("coins.txt", "w")
+        coins_file.write(str(coins))
+        coins_file.close()
+    except:
+        # Can't write it
+        print("Unable to save the high score.")
+
+    # If the skin selected = 2, the user was trying to buy and has now been given access to the luigi skin
+    if skinselected == 2:
+        luigipurchased = True
 
 def gameloop():
     done = False
@@ -1500,7 +1534,7 @@ def gameloop():
                 text_rect = text.get_rect(center=(960, 425))
                 screen.blit(text, text_rect)
 
-                button_1("MAIN MENU",840,475,250,60,WHITE,GREY,"4") # This button take you to the main menu
+                button_1("MAIN MENU",840,475,250,60,WHITE,GREY,0,"M") # This button take you to the main menu
                 # Save the new value for coins to the text file
                 try:
                     # Write the file to disk
@@ -1541,7 +1575,7 @@ def gameloop():
                 text_rect = text.get_rect(center=(960, 425))
                 screen.blit(text, text_rect)
 
-                button_1("MAIN MENU",840,475,250,60,WHITE,GREY,"4") # This button take you to the main menu
+                button_1("MAIN MENU",840,475,250,60,WHITE,GREY,0,"M") # This button take you to the main menu
 
                 # Save the new value for coins to the text file
                 try:
