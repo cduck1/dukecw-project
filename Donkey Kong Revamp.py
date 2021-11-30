@@ -19,11 +19,10 @@ BROWN = (165,42,42)
 DARKBROWN = (43,29,14)
 GREY = (180, 180, 180)
 
-pygame.init()
-
 # Variables relating to skins
 luigipurchased = False
-coins = 0 # this initiates coins as a global variable, which is needed for the loadcoins() method so that we can load the coins in the game loop as well as in the shop
+
+pygame.init()
 
 # Set the screen size
 size = (1920,1000)
@@ -118,7 +117,7 @@ def shop():
 
         # Shows a preview of the skin in the shop
         # I made the button larger do I could fit in a completely unrelated (not part of the button function) piece of text that shows the price of the skin
-        screen.blit(pygame.image.load("shopmariopreview.PNG"),(330,200))
+        screen.blit(pygame.image.load("shopluigipreview.PNG"),(330,200))
         button_1("MARIO",330,450,250,80,WHITE,GREY,"3")
         font = pygame.font.Font('freesansbold.ttf', 15)
         text = font.render(str("FREE - DEFAULT"), 1, WHITE)
@@ -169,24 +168,10 @@ def confirmpurchase():
 
 # If the user has clicked yes on confirm purchase, this method is run
 def skinpurchased():
-    pass
-    #if game.coins > 1000:
-    #    game.coins -= 1000
-    #else:
-    #    print("You do not have sufficient funds to make this purchase")
-
-def loadcoins():
-    # We get the variable "self.coins" from the file "coins.txt"
-    # Try to read the high score from a file
-    try:
-        coins_file = open("coins.txt", "r") # Reads the text file and saves it to the coins_file variable
-        coins = int(coins_file.read()) # saves the number read from the text file to the coins variable
-        coins_file.close() # closes the coins variable
-    except:
-        # If there is some kind of error, set the coins variable to 0
-        coins = 0
-
-loadcoins(coins) # loads the coins for the whole game - this is not in the game loop because we also use coins in the shop, which means coins must be loaded globally
+    if game.coins > 1000:
+        game.coins -= 1000
+    else:
+        print("You do not have sufficient funds to make this purchase")
 
 def gameloop():
     done = False
@@ -333,14 +318,14 @@ def gameloop():
 
         def coinhit(self):
             if pygame.sprite.spritecollide(self,game.coin_group, True):
-                coins += 1
-                print("Coins: ", int(coins))
+                game.coins += 1
+                print("Coins: ", int(game.coins))
 
         # When we hit a new portal we move to the next level
         def portalhit(self):
             if pygame.sprite.spritecollide(self, game.portal_group, False):
                 game.level += 1
-                coins += 2 # You gain 2 coins when you finish each level
+                game.coins += 2 # You gain 2 coins when you finish each level
                 game.clearlevel() # Clear the level
                 game.levelsetup() # And set the level up again
 
@@ -553,7 +538,7 @@ def gameloop():
 
         def die(self):
             if self.health <= 0:
-                coins += 200 # You gain 200 coins when you win/ beat the game
+                game.coins += 200 # You gain 200 coins when you win/ beat the game
                 game.youwin = True
 
         def healthbar(self):
@@ -971,6 +956,7 @@ def gameloop():
             # Variables
             self.level = 10
             self.lives = 3 # We refer to the game for the lives of the player as this allows the lives to be continued from level to level - the lives do not reset back to 3 every time you go to the next level
+            self.loadcoins()
             self.startposx = 0
             self.startposy = 0
 
@@ -1258,6 +1244,18 @@ def gameloop():
             # Calls the method levelsetup() so to build the map - this is still in the __init__() function
             self.levelsetup()
 
+        def loadcoins(self):
+            # We get the variable "self.coins" from the file "coins.txt"
+            self.coins = 0 # Initiates the variable
+            # Try to read the high score from a file
+            try:
+                coins_file = open("coins.txt", "r") # Reads the text file and saves it to the coins_file variable
+                self.coins = int(coins_file.read()) # saves the number read from the text file to the coins variable
+                coins_file.close() # closes the coins variable
+            except:
+                # If there is some kind of error, set the coins variable to 0
+                self.coins = 0
+
         def update(self):
             self.spawnbarrels()
             self.spawnhammerpickup()
@@ -1343,7 +1341,7 @@ def gameloop():
                     screen.blit(text, (10, 115))
                 # For player's coins
                 font = pygame.font.Font('freesansbold.ttf', 30)
-                text = font.render(("COINS: " + str(coins)), 1, WHITE)
+                text = font.render(("COINS: " + str(self.coins)), 1, WHITE)
                 screen.blit(text, (10, 80))
 
             self.losescreen()
@@ -1461,7 +1459,7 @@ def gameloop():
             # Print stuff - this goes at the bottom of this because the player must be created to have myPlayer.lives
             print("Level: ", int(self.level))
             print("Lives: ", int(self.lives))
-            print("Coins: ", int(coins))
+            print("Coins: ", int(self.coins))
 
         # Allows us to move on to the next level by clearing the current level first
         def clearlevel(self):
@@ -1498,7 +1496,7 @@ def gameloop():
 
                 # Displayes the player's coins in the endscreen
                 font = pygame.font.Font('freesansbold.ttf', 30)
-                text = font.render(("COINS: " + str(coins)), 1, WHITE)
+                text = font.render(("COINS: " + str(self.coins)), 1, WHITE)
                 text_rect = text.get_rect(center=(960, 425))
                 screen.blit(text, text_rect)
 
@@ -1507,7 +1505,7 @@ def gameloop():
                 try:
                     # Write the file to disk
                     coins_file = open("coins.txt", "w")
-                    coins_file.write(str(coins))
+                    coins_file.write(str(self.coins))
                     coins_file.close()
                 except:
                     # Can't write it
@@ -1539,7 +1537,7 @@ def gameloop():
 
                 # Displayes the player's coins in the endscreen
                 font = pygame.font.Font('freesansbold.ttf', 30)
-                text = font.render(("COINS: " + str(coins)), 1, WHITE)
+                text = font.render(("COINS: " + str(self.coins)), 1, WHITE)
                 text_rect = text.get_rect(center=(960, 425))
                 screen.blit(text, text_rect)
 
@@ -1549,7 +1547,7 @@ def gameloop():
                 try:
                     # Write the file to disk
                     coins_file = open("coins.txt", "w")
-                    coins_file.write(str(coins))
+                    coins_file.write(str(self.coins))
                     coins_file.close()
                 except:
                     # Can't write it
