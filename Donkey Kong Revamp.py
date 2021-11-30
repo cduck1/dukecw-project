@@ -50,7 +50,7 @@ def mainmenu():
         screen.blit(text, text_rect)
 
         button_1("PLAY",840,330,250,60,WHITE,GREY,"1")
-        button_1("SKINS",840,410,250,60,WHITE,GREY,"2")
+        button_1("SHOP",840,410,250,60,WHITE,GREY,"2")
         button_1("QUIT",840,490,250,60,WHITE,GREY,"Q")
             
         pygame.display.flip()
@@ -66,10 +66,10 @@ def button_1(msg1,xb1,yb1,wb1,hb1,icb1,acb1,action1=None): # msg1 = the message 
             if action1 == "1":
                 gameloop()
             elif action1 == "2":
+                shop() # The skins shop
+            # Actions related to the skins shop
+            elif action1 == "3":
                 pass
-                # This is where the skins shop will go later on
-            elif action1 == "4":
-                mainmenu()
             elif action1 == "Q":
                 pygame.quit()
     else:
@@ -83,6 +83,37 @@ def button_1(msg1,xb1,yb1,wb1,hb1,icb1,acb1,action1=None): # msg1 = the message 
 def text_objects(text,font):
     textSurface = font.render(text, True, WHITE)
     return textSurface, textSurface.get_rect()
+
+def shop():
+    shop = True
+    while shop:
+        for event in pygame.event.get(): # User did something
+            if event.type == pygame.QUIT: # If user clicked close
+                shop = False # Flag that we are done so we exit this loop
+                pygame.quit # If the cross in the top right is pressed while in the menu, we exit the game
+            elif event.type==pygame.KEYDOWN:
+                if event.key==pygame.K_ESCAPE: 
+                    shop = False
+        # -- Drawing the menu screen
+        screen.fill(BLACK)
+        # Displays "THE SHOP"
+        font = pygame.font.Font('freesansbold.ttf', 84)
+        text = font.render(str("THE SHOP"), 1, WHITE)
+        text_rect = text.get_rect(center=(960, 75))
+        screen.blit(text, text_rect)
+        # Tells the user what they can do in the shop
+        font = pygame.font.Font('freesansbold.ttf', 20)
+        text = font.render(str("HERE YOU CAN SPEND YOU HARD EARNED COINS ON COSMETIC UPGRADES"), 1, WHITE)
+        text_rect = text.get_rect(center=(960, 120))
+        screen.blit(text, text_rect)
+
+        # Shows a preview of the skin in the shop
+        screen.blit(pygame.image.load("shopluigipreview.PNG"),(330,200))
+        button_1("LUIGI",330,450,250,60,WHITE,GREY,"3")
+
+
+        pygame.display.flip()
+        clock.tick(60)
 
 def gameloop():
     done = False
