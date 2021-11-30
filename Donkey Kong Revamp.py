@@ -19,6 +19,9 @@ BROWN = (165,42,42)
 DARKBROWN = (43,29,14)
 GREY = (180, 180, 180)
 
+# Variables relating to skins
+luigipurchased = False
+
 pygame.init()
 
 # Set the screen size
@@ -69,6 +72,10 @@ def button_1(msg1,xb1,yb1,wb1,hb1,icb1,acb1,action1=None): # msg1 = the message 
                 shop() # The skins shop
             # Actions related to the skins shop
             elif action1 == "3":
+                confirmpurchase() # This calls the method that requests the user confirms their purchase for the skin
+            elif action1 == "4":
+                skinpurchased() # This calls the method that removes the user's coins in exchange for the skin skins
+            elif action1 == "5":
                 pass
             elif action1 == "Q":
                 pygame.quit()
@@ -84,6 +91,7 @@ def text_objects(text,font):
     textSurface = font.render(text, True, WHITE)
     return textSurface, textSurface.get_rect()
 
+# The method for the shop
 def shop():
     shop = True
     while shop:
@@ -108,12 +116,62 @@ def shop():
         screen.blit(text, text_rect)
 
         # Shows a preview of the skin in the shop
+        # I made the button larger do I could fit in a completely unrelated (not part of the button function) piece of text that shows the price of the skin
         screen.blit(pygame.image.load("shopluigipreview.PNG"),(330,200))
-        button_1("LUIGI",330,450,250,60,WHITE,GREY,"3")
+        button_1("MARIO",330,450,250,80,WHITE,GREY,"3")
+        font = pygame.font.Font('freesansbold.ttf', 15)
+        text = font.render(str("FREE - DEFAULT"), 1, WHITE)
+        text_rect = text.get_rect(center=(455, 515))
+        screen.blit(text, text_rect)
 
+        # Shows a preview of the skin in the shop
+        screen.blit(pygame.image.load("shopluigipreview.PNG"),(630,200))
+        button_1("LUIGI",630,450,250,80,WHITE,GREY,"3")
+        # This checks if luigi has already been purchased an displays a different message (already purchased/ 1000 coins) depending on that
+        if luigipurchased == False:
+            font = pygame.font.Font('freesansbold.ttf', 15)
+            text = font.render(str("1000 COINS"), 1, WHITE)
+            text_rect = text.get_rect(center=(755, 515))
+            screen.blit(text, text_rect)
+        else:
+            font = pygame.font.Font('freesansbold.ttf', 15)
+            text = font.render(str("ALREADY PURCHASED"), 1, WHITE)
+            text_rect = text.get_rect(center=(755, 515))
+            screen.blit(text, text_rect)
 
         pygame.display.flip()
         clock.tick(60)
+
+# Confirm purchase method - used when the user tries to buy a skin in the shop, they must confirm their purchase
+def confirmpurchase():
+    confirm = True
+    while confirm:
+        for event in pygame.event.get(): # User did something
+            if event.type == pygame.QUIT: # If user clicked close
+                confirm = False # Flag that we are done so we exit this loop
+                pygame.quit # If the cross in the top right is pressed while in the menu, we exit the game
+            elif event.type==pygame.KEYDOWN:
+                if event.key==pygame.K_ESCAPE: 
+                    confirm = False
+        # -- Drawing the menu screen
+        screen.fill(BLACK)
+        # Displays "CONFIRM PURCHASE" text
+        font = pygame.font.Font('freesansbold.ttf', 60)
+        text = font.render(str("CONFIRM PURCHASE"), 1, WHITE)
+        text_rect = text.get_rect(center=(960, 400))
+        screen.blit(text, text_rect)
+        button_1("YES",690,450,250,60,WHITE,GREY,"4") # This button is pressed when the user is confirming the purchase for the skin they previously clicked on
+        button_1("NO",980,450,250,60,WHITE,GREY,"5") # This button is pressed when the user is declining the purchase for the skin they previously clicked on
+
+        pygame.display.flip()
+        clock.tick(60)
+
+# If the user has clicked yes on confirm purchase, this method is run
+def skinpurchased():
+    if game.coins > 1000:
+        game.coins -= 1000
+    else:
+        print("You do not have sufficient funds to make this purchase")
 
 def gameloop():
     done = False
