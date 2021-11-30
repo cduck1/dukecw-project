@@ -265,8 +265,7 @@ def gameloop():
         def __init__(self, color, width, height, x, y):
             super().__init__()
             # Create a sprite and fill it with a the image
-            self.image = pygame.Surface([width,height])
-            self.image.fill(color)
+            self.image = pygame.image.load('mariotopdownS.PNG')
             self.rect = self.image.get_rect()
             self.rect.x = x
             self.rect.y = y
@@ -374,7 +373,7 @@ def gameloop():
         def swinghammer(self):
             if pygame.key.get_pressed()[pygame.K_SPACE]: # This is so you must press the space bar to swing the hammer - not just hold it down constantely
                 if (self.hammerswings > 0) and (self.swingcooldown == False) and (self.hammerpresent == False):
-                    self.myHammer = hammer(PINK, 10, 4, self.rect.x + 40, self.rect.y + 18)
+                    self.myHammer = hammer(PINK, 30, 15, self.rect.x + 40, self.rect.y + 18)
                     game.hammer_group.add(self.myHammer)
                     game.moving_sprites_group.add(self.myHammer)
                     game.all_sprites_group.add(self.myHammer)
@@ -413,8 +412,7 @@ def gameloop():
         def __init__(self, color, width, height, x, y):
             super().__init__()
             # Create a sprite and fill it with a the image
-            self.image = pygame.Surface([width,height])
-            self.image.fill(color)
+            self.image = pygame.image.load('donkeykongEnobg.PNG')
             self.rect = self.image.get_rect()
             self.rect.x = x
             self.rect.y = y
@@ -461,10 +459,14 @@ def gameloop():
         def movementx(self):
             # Moves donkey kong towards mario slowly on the x axis - the + 20 and + 40 are to ensure donkey kong goes to the centre of the player
             if self.isMove == True:
+                # Movement right
                 if game.myArenaplayer.rect.x + 20 > self.rect.x + 40:
                     self.changespeed(1,0)
+                    self.image = pygame.image.load('donkeykongEnobg.PNG')
+                # Movement left
                 if game.myArenaplayer.rect.x + 20 < self.rect.x + 40:
                     self.changespeed(-1,0)
+                    self.image = pygame.image.load('donkeykongWnobg.PNG')
 
             # Move donkey kong left/right
             self.rect.x += self.change_x
@@ -553,8 +555,7 @@ def gameloop():
         def __init__(self, color, width, height,change_x,change_y, x, y):
             super().__init__()
             # Create a sprite and fill it with a the image
-            self.image = pygame.Surface([width,height])
-            self.image.fill(color)
+            self.image = pygame.image.load('throwingbarrel.PNG')
             self.rect = self.image.get_rect()
             self.rect.x = x
             self.rect.y = y
@@ -587,8 +588,7 @@ def gameloop():
         def __init__(self, color, width, height, x, y):
             super().__init__()
             # Create a sprite and fill it with a the image
-            self.image = pygame.Surface([width,height])
-            self.image.fill(color)
+            self.image = pygame.image.load('hammerpickup.PNG')
             self.rect = self.image.get_rect()
             self.rect.x = x
             self.rect.y = y
@@ -599,8 +599,7 @@ def gameloop():
         def __init__(self, color, width, height, x, y):
             super().__init__()
             # Create a sprite and fill it with a the image
-            self.image = pygame.Surface([width,height])
-            self.image.fill(color)
+            self.image = pygame.image.load('hammernobgresize.PNG')
             self.rect = self.image.get_rect()
             self.rect.x = x
             self.rect.y = y
