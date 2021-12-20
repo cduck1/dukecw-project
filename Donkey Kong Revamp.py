@@ -60,11 +60,12 @@ def mainmenu():
 def button_1(msg1,xb1,yb1,wb1,hb1,icb1,acb1,buttonpressed,action1=None): # msg1 = the message inside the button, xb1 = x coords of button, yb1 = y coords, wb1 = width, hb1 = height, icb1 = inactive colour, acb1 = active colour, action = the output when button is pressed, buttonpressed = the button that was pressed - e.g. if luigi's button was pressed it would say "luigi"
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
-    if xb1+wb1 >mouse[0] > xb1 and yb1+hb1 > mouse[1] > yb1:
+    if xb1+wb1 > mouse[0] > xb1 and yb1+hb1 > mouse[1] > yb1:
         pygame.draw.rect(screen, icb1,(xb1,yb1,wb1,hb1),5)
         if click[0] == 1 and action1 !=None:
             if buttonpressed > 0: # If the button pressed is anything other than 0 (i.e. a button not related to the skins shop), it is saved to a skinselected variable
                 skinselected = buttonpressed # skin selected allows us to identify which skin the user clicked on and is trying to buy
+                print(skinselected)
             if action1 == "1":
                 gameloop()
             elif action1 == "2":
@@ -185,7 +186,6 @@ def confirmpurchase():
 
 # If the user has clicked yes on confirm purchase, this method is run
 def skinpurchased(skinselected):
-    print(skinselected)
     # This is essentially the same as the loadcoins() method but we must recreate the loading of coins in the same method as where they are changed because of python having difficulties with passing variables by reference
     # We get the variable "coins" from the file "coins.txt"
     coins = 0 # Initiates the variable
@@ -213,6 +213,7 @@ def skinpurchased(skinselected):
     # If the player has at least 1000 coins, they have enough money to make the purchase and the purchase is made (and they haven't already purchased the skin) we minus 1000 from coins and give them access to the skin. If the player does not have enough money, this is printed in the console and they are returned to the shop
     if coins >= 1000 and luigipurchased == False:
         coins -= 1000
+        luigipurchased = True
         # We write to the text file that we have purchased the luigi skin by writing "True"
         # Save the new value for coins to the text file
         try:
