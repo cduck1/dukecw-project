@@ -64,8 +64,8 @@ def button_1(msg1,xb1,yb1,wb1,hb1,icb1,acb1,buttonpressed,action1=None): # msg1 
         pygame.draw.rect(screen, icb1,(xb1,yb1,wb1,hb1),5)
         if click[0] == 1 and action1 !=None:
             if buttonpressed > 0: # If the button pressed is anything other than 0 (i.e. a button not related to the skins shop), it is saved to a skinselected variable
+                global skinselected
                 skinselected = buttonpressed # skin selected allows us to identify which skin the user clicked on and is trying to buy
-                print(skinselected)
             if action1 == "1":
                 gameloop()
             elif action1 == "2":
