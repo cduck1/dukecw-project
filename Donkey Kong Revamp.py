@@ -134,7 +134,7 @@ def shop():
         # Try to read the luigipurchased from a file
         try:
             luigi_file = open("purchasedluigi.txt", "r") # Reads the text file and saves it to the luigi_file variable
-            luigipurchased = int(luigi_file.read()) # saves what was read from the text file to the luigipurchased variable - this should be either "True" or "False"
+            luigipurchased = str(luigi_file.read()) # saves what was read from the text file to the luigipurchased variable - this should be either "True" or "False"
             luigi_file.close() # closes the coins variable
         except:
             # If there is some kind of error, set the luigipurchased variable to False
@@ -204,7 +204,7 @@ def skinpurchased(skinselected):
         # Try to read the luigipurchased from a file
         try:
             luigi_file = open("purchasedluigi.txt", "r") # Reads the text file and saves it to the luigi_file variable
-            luigipurchased = int(luigi_file.read()) # saves what was read from the text file to the luigipurchased variable - this should be either "True" or "False"
+            luigipurchased = str(luigi_file.read()) # saves what was read from the text file to the luigipurchased variable - this should be either "True" or "False"
             luigi_file.close() # closes the coins variable
         except:
             # If there is some kind of error, set the luigipurchased variable to False
@@ -221,10 +221,10 @@ def skinpurchased(skinselected):
             luigi_file = open("purchasedluigi.txt", "w")
             luigi_file.write(str(luigipurchased))
             luigi_file.close()
+            print("Transaction confirmed")
         except:
             # Can't write it
             print("Unable to write whether luigi was purchased.")
-        print("Transaction confirmed")
         shop()
     else:
         print("You do not have sufficient funds to make the purchase")
