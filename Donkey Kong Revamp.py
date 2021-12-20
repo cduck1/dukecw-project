@@ -292,9 +292,9 @@ def applyskin(skinselected):
     # Save the new value for skinapplied to the corresponding text file so that this skin is loaded the next time that the game is opened.
     try:
         # Write the file to disk
-        coins_file = open("currentskinapplied.txt", "w")
-        coins_file.write(str(skinapplied))
-        coins_file.close()
+        skin_file = open("currentskinapplied.txt", "w")
+        skin_file.write(str(skinapplied))
+        skin_file.close()
     except:
         # Can't write it
         print("Unable to save skinapplied.")
@@ -473,6 +473,56 @@ def gameloop():
                         self.currentrightimage = 0
                     self.image = Game.mariorunright[self.currentrightimage]
             self.animationcounterright += 1
+
+    # This class is exactly the same as the player class and is only used so we can apply skins easily. When skinapplied is 2 (the value of this variable is taken from the text file), this class is instantiated instead of the player class - the player class' value = 1
+    class luigi(player):
+        # Define the constructor for the player
+        def __init__(self, color, width, height, x_speed, y_speed, x, y):
+            # Call the super class (the super class for the player is sprite)
+            super().__init__()
+            # Set the position of the sprite
+            self.image = pygame.image.load('luigi1.PNG') # This is OVERRIDED to account for the different array of skins being loaded when luigi moves in comparison to mario
+            self.currentleftimage = 0 # The start variable for the array image
+            self.currentrightimage = 0 # The start variable for the array image
+            self.rect = self.image.get_rect()
+            self.rect.x = x
+            self.rect.y = y
+            # Set a speed vector
+            self.change_x = 0
+            self.change_y = 0
+            # Flags
+            self.isJump = False
+            self.gravity = True
+            self.moveright = False
+            self.moveleft = False
+            # Variables
+            self.startjumptime = 0
+            self.animationcounterleft = 0
+            self.animationcounterright = 0
+            self.startposx = 0
+            self.startposy = 0
+        
+        # This is overrided to account for the different array of skins being loaded when luigi moves in comparison to mario
+        def animateleft(self):
+            if self.animationcounterleft % 6 == 0:
+                if self.moveleft == True and self.moveright == False:
+                    self.currentleftimage += 1
+                    if self.currentleftimage>= len(Game.luigirunleft):
+                        self.currentleftimage = 0
+                    self.image = Game.luigirunleft[self.currentleftimage]
+            self.animationcounterleft += 1
+
+        # This is overrided to account for the different array of skins being loaded when luigi moves in comparison to mario
+        def animateright(self):
+            if self.animationcounterright % 6 == 0: # Slows down the animation
+                if self.moveright == True and self.moveleft == False:
+                    # Updates the current image to the next image in the array (for animations) - if self.currentimage = 10, we restart the array from image number 0. It only does this every 6 ticks because otherwise it spins really (too) fast
+                    self.currentrightimage += 1
+                    if self.currentrightimage >= len(Game.luigirunright):
+                        self.currentrightimage = 0
+                    self.image = Game.luigirunright[self.currentrightimage]
+            self.animationcounterright += 1
+
 
     # This is the player but in the arena - we have a different class for this player because it allows us to change the players movement along with many other things (e.g: no jumping, and no need for if statement before every difference between the two players checking whether it is level 10 yet or not)
     class arenaplayer(pygame.sprite.Sprite):
@@ -1516,15 +1566,35 @@ def gameloop():
                     self.all_sprites_group.add(self.myInnerWall)
                 # 3s in the array represent the starting position of the player
                 if self.levelselected[i] == 3:
-                    # Instantiate the player class - colour, width, height, x, y, speed
-                    # I need to make the player a better size so that its easier to go up ladders - but also need him to start on the floor
-                    self.myPlayer = player(BLUE, 40, 40, 20, 20, temp_x, temp_y)
-                    # Add the player to a player group and an all sprites group and a moving sprites group
-                    self.player_group.add(self.myPlayer)
-                    self.moving_sprites_group.add(self.myPlayer)
-                    self.all_sprites_group.add(self.myPlayer)
-                    self.startposx = temp_x
-                    self.startposy = temp_y
+                    # Here we are loading the value of skinapplied from a text file named "currentskinapplied". This will allow us to determine which player we instantiate (mario or luigi). Either way, the object created is still called "myPlayer" and therefore collisions and game logic should function the same
+                    # We get the variable "self.coins" from the file "coins.txt"
+                    self.skinapplied = 0 # Initiates the variable
+                    # Try to read coins from a file
+                    try:
+                        skin_file = open("currentskinapplied.txt", "r") # Reads the text file and saves it to the coins_file variable
+                        self.skinapplied = int(skin_file.read()) # saves the number read from the text file to the coins variable
+                        skin_file.close() # closes the coins variable
+                    except:
+                        # If there is some kind of error, set the coins variable to 0
+                        print("An error with loading skinapplied and therefore the player has occured")
+
+                    # Instantiates the player class - colour, width, height, x, y, speed - if skinapplied = 1 then the player class with a corresponding mario skin is applied, is skinapplied = 2 then the luigi class (with the corresponding luigi skin) is applied
+                    if self.skinapplied == 1:
+                        self.myPlayer = player(BLUE, 40, 40, 20, 20, temp_x, temp_y)
+                        # Add the player to a player group and an all sprites group and a moving sprites group
+                        self.player_group.add(self.myPlayer)
+                        self.moving_sprites_group.add(self.myPlayer)
+                        self.all_sprites_group.add(self.myPlayer)
+                        self.startposx = temp_x
+                        self.startposy = temp_y
+                    elif self.skinapplied == 2:
+                        self.myPlayer = luigi(BLUE, 40, 40, 20, 20, temp_x, temp_y)
+                        # Add the player to a player group and an all sprites group and a moving sprites group
+                        self.player_group.add(self.myPlayer)
+                        self.moving_sprites_group.add(self.myPlayer)
+                        self.all_sprites_group.add(self.myPlayer)
+                        self.startposx = temp_x
+                        self.startposy = temp_y
                 # 4s in the array represent the ladders
                 if self.levelselected[i] == 4:
                     self.myLadder = ladder(YELLOW, 40, 40,temp_x, temp_y-1) # The reason for the temp_y-1 is so that when the player moves across the top of a ladder, then dont start moving down and then get stuck and gravity is off the whole way across with it like this
