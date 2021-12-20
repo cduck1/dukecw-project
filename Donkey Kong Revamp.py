@@ -524,7 +524,6 @@ def gameloop():
                     self.image = Game.luigirunright[self.currentrightimage]
             self.animationcounterright += 1
 
-
     # This is the player but in the arena - we have a different class for this player because it allows us to change the players movement along with many other things (e.g: no jumping, and no need for if statement before every difference between the two players checking whether it is level 10 yet or not)
     class arenaplayer(pygame.sprite.Sprite):
         # Define the constructor for the wall class
