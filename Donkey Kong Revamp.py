@@ -80,7 +80,7 @@ def button_1(msg1,xb1,yb1,wb1,hb1,icb1,acb1,buttonpressed,action1=None): # msg1 
             elif action1 == "6":
                 confirmselection()
             elif action1 == "7":
-                applyskin()
+                applyskin(skinselected)
             elif action1 == "M":
                 mainmenu()
             elif action1 == "Q":
@@ -298,6 +298,7 @@ def applyskin(skinselected):
     except:
         # Can't write it
         print("Unable to save skinapplied.")
+    shop() # This returns us back to the shop once yes has been pressed from the confirmskin screen
 
 def gameloop():
     done = False
@@ -1127,6 +1128,8 @@ def gameloop():
             Game.spinright = [pygame.image.load('barrel0.PNG'),pygame.image.load('barrel1.PNG'),pygame.image.load('barrel2.PNG'),pygame.image.load('barrel3.PNG'),pygame.image.load('barrel4.PNG'),pygame.image.load('barrel5.PNG'),pygame.image.load('barrel6.PNG'),pygame.image.load('barrel7.PNG'),pygame.image.load('barrel8.PNG')]
             Game.mariorunleft = [pygame.image.load('mario2nobgleft.PNG'),pygame.image.load('mario3nobgleft.PNG'),pygame.image.load('mario4nobgleft.PNG'),pygame.image.load('mario5nobgleft.PNG')]
             Game.mariorunright = [pygame.image.load('mario2nobg.PNG'),pygame.image.load('mario3nobg.PNG'),pygame.image.load('mario4nobg.PNG'),pygame.image.load('mario5nobg.PNG')]
+            Game.luigirunleft = [pygame.image.load('luigi2left.PNG'),pygame.image.load('luigi3left.PNG'),pygame.image.load('luigi4left.PNG'),pygame.image.load('luigi5left.PNG')]
+            Game.luigirunright = [pygame.image.load('luigi2.PNG'),pygame.image.load('luigi3.PNG'),pygame.image.load('luigi4.PNG'),pygame.image.load('luigi5.PNG')]
             Game.arenamarioimages = [pygame.image.load('mariotopdownN.PNG'),pygame.image.load('mariotopdownE.PNG'),pygame.image.load('mariotopdownS.PNG'),pygame.image.load('mariotopdownW.PNG')]
 
             # Variables
