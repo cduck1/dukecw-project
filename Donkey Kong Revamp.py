@@ -19,9 +19,6 @@ BROWN = (165,42,42)
 DARKBROWN = (43,29,14)
 GREY = (180, 180, 180)
 
-# Variables relating to skins
-luigipurchased = False
-
 pygame.init()
 
 # Set the screen size
@@ -63,10 +60,11 @@ def mainmenu():
 def button_1(msg1,xb1,yb1,wb1,hb1,icb1,acb1,buttonpressed,action1=None): # msg1 = the message inside the button, xb1 = x coords of button, yb1 = y coords, wb1 = width, hb1 = height, icb1 = inactive colour, acb1 = active colour, action = the output when button is pressed, buttonpressed = the button that was pressed - e.g. if luigi's button was pressed it would say "luigi"
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
-    skinselected = buttonpressed # skin selected allows us to identify which skin the user clicked on and is trying to buy
     if xb1+wb1 >mouse[0] > xb1 and yb1+hb1 > mouse[1] > yb1:
         pygame.draw.rect(screen, icb1,(xb1,yb1,wb1,hb1),5)
         if click[0] == 1 and action1 !=None:
+            if buttonpressed > 0: # If the button pressed is anything other than 0 (i.e. a button not related to the skins shop), it is saved to a skinselected variable
+                skinselected = buttonpressed # skin selected allows us to identify which skin the user clicked on and is trying to buy
             if action1 == "1":
                 gameloop()
             elif action1 == "2":
@@ -76,8 +74,8 @@ def button_1(msg1,xb1,yb1,wb1,hb1,icb1,acb1,buttonpressed,action1=None): # msg1 
                 confirmpurchase() # This calls the method that requests the user confirms their purchase for the skin
             elif action1 == "4":
                 skinpurchased(skinselected) # This calls the method that removes the user's coins in exchange for the skin
-            elif action1 == "5":
-                mainmenu()
+            elif action1 == "5": # If the user presses "no" on the confirm purchase screen, they are taken back to the shop
+                shop()
             elif action1 == "M":
                 mainmenu()
             elif action1 == "Q":
@@ -129,14 +127,27 @@ def shop():
 
         # Shows a preview of the skin in the shop
         screen.blit(pygame.image.load("shopluigipreview.PNG"),(630,200))
-        button_1("LUIGI",630,450,250,80,WHITE,GREY,2,"3")
-        # This checks if luigi has already been purchased an displays a different message (already purchased/ 1000 coins) depending on that
+
+        # Reads the purchasedluigi text file to see if luigi has previously been purchased - if he has a different button with a different function (no function) is displayed
+        luigipurchased = False # Initiates the variable
+        # Try to read the luigipurchased from a file
+        try:
+            luigi_file = open("purchasedluigi.txt", "r") # Reads the text file and saves it to the luigi_file variable
+            luigipurchased = int(luigi_file.read()) # saves what was read from the text file to the luigipurchased variable - this should be either "True" or "False"
+            luigi_file.close() # closes the coins variable
+        except:
+            # If there is some kind of error, set the luigipurchased variable to False
+            luigipurchased = False
+
+        # This checks if luigi has already been purchased an displays a different button with a different description message (already purchased/ 1000 coins) depending on that - if luigi has already been purchased, a button with no function is displayed
         if luigipurchased == False:
+            button_1("LUIGI",630,450,250,80,WHITE,GREY,2,"3")
             font = pygame.font.Font('freesansbold.ttf', 15)
             text = font.render(str("1000 COINS"), 1, WHITE)
             text_rect = text.get_rect(center=(755, 515))
             screen.blit(text, text_rect)
         else:
+            button_1("LUIGI",630,450,250,80,WHITE,GREY,0,"0")
             font = pygame.font.Font('freesansbold.ttf', 15)
             text = font.render(str("ALREADY PURCHASED"), 1, WHITE)
             text_rect = text.get_rect(center=(755, 515))
@@ -174,10 +185,11 @@ def confirmpurchase():
 
 # If the user has clicked yes on confirm purchase, this method is run
 def skinpurchased(skinselected):
+    print(skinselected)
     # This is essentially the same as the loadcoins() method but we must recreate the loading of coins in the same method as where they are changed because of python having difficulties with passing variables by reference
     # We get the variable "coins" from the file "coins.txt"
     coins = 0 # Initiates the variable
-    # Try to read the high score from a file
+    # Try to read coins from a file
     try:
         coins_file = open("coins.txt", "r") # Reads the text file and saves it to the coins_file variable
         coins = int(coins_file.read()) # saves the number read from the text file to the coins variable
@@ -186,9 +198,33 @@ def skinpurchased(skinselected):
         # If there is some kind of error, set the coins variable to 0
         coins = 0
 
-    # If the player has at least 1000 coins, they have enough money to make the purchase and the purchase is made - we minus 1000 from coins and give them access to the skin. If the player does not have enough money, this is printed in the console and they are returned to the shop
-    if coins >= 1000:
+    # If the skin selected was luigi, we first check that we haven't already purchased the luigi skin - this allows us to determine whether the player can buy the skin for the first time 
+    if skinselected == 2:
+        luigipurchased = False # Initiates the variable
+        # Try to read the luigipurchased from a file
+        try:
+            luigi_file = open("purchasedluigi.txt", "r") # Reads the text file and saves it to the luigi_file variable
+            luigipurchased = int(luigi_file.read()) # saves what was read from the text file to the luigipurchased variable - this should be either "True" or "False"
+            luigi_file.close() # closes the coins variable
+        except:
+            # If there is some kind of error, set the luigipurchased variable to False
+            luigipurchased = False
+
+    # If the player has at least 1000 coins, they have enough money to make the purchase and the purchase is made (and they haven't already purchased the skin) we minus 1000 from coins and give them access to the skin. If the player does not have enough money, this is printed in the console and they are returned to the shop
+    if coins >= 1000 and luigipurchased == False:
         coins -= 1000
+        # We write to the text file that we have purchased the luigi skin by writing "True"
+        # Save the new value for coins to the text file
+        try:
+            # Write the file to disk
+            luigi_file = open("purchasedluigi.txt", "w")
+            luigi_file.write(str(luigipurchased))
+            luigi_file.close()
+        except:
+            # Can't write it
+            print("Unable to write whether luigi was purchased.")
+        print("Transaction confirmed")
+        shop()
     else:
         print("You do not have sufficient funds to make the purchase")
         shop()
@@ -201,11 +237,7 @@ def skinpurchased(skinselected):
         coins_file.close()
     except:
         # Can't write it
-        print("Unable to save the high score.")
-
-    # If the skin selected = 2, the user was trying to buy and has now been given access to the luigi skin
-    if skinselected == 2:
-        luigipurchased = True
+        print("Unable to save coins.")
 
 def gameloop():
     done = False
@@ -988,7 +1020,7 @@ def gameloop():
             Game.arenamarioimages = [pygame.image.load('mariotopdownN.PNG'),pygame.image.load('mariotopdownE.PNG'),pygame.image.load('mariotopdownS.PNG'),pygame.image.load('mariotopdownW.PNG')]
 
             # Variables
-            self.level = 10
+            self.level = 1
             self.lives = 3 # We refer to the game for the lives of the player as this allows the lives to be continued from level to level - the lives do not reset back to 3 every time you go to the next level
             self.loadcoins()
             self.startposx = 0
@@ -1281,7 +1313,7 @@ def gameloop():
         def loadcoins(self):
             # We get the variable "self.coins" from the file "coins.txt"
             self.coins = 0 # Initiates the variable
-            # Try to read the high score from a file
+            # Try to read coins from a file
             try:
                 coins_file = open("coins.txt", "r") # Reads the text file and saves it to the coins_file variable
                 self.coins = int(coins_file.read()) # saves the number read from the text file to the coins variable
@@ -1543,7 +1575,7 @@ def gameloop():
                     coins_file.close()
                 except:
                     # Can't write it
-                    print("Unable to save the high score.")
+                    print("Unable to save coins.")
 
                 # Updates the screen
                 pygame.display.flip()
@@ -1585,7 +1617,7 @@ def gameloop():
                     coins_file.close()
                 except:
                     # Can't write it
-                    print("Unable to save the high score.")
+                    print("Unable to save coins.")
                 
                 # Updates the screen
                 pygame.display.flip()
