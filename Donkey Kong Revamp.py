@@ -77,6 +77,10 @@ def button_1(msg1,xb1,yb1,wb1,hb1,icb1,acb1,buttonpressed,action1=None): # msg1 
                 skinpurchased(skinselected) # This calls the method that removes the user's coins in exchange for the skin
             elif action1 == "5": # If the user presses "no" on the confirm purchase screen, they are taken back to the shop
                 shop()
+            elif action1 == "6":
+                confirmselection()
+            elif action1 == "7":
+                applyskin()
             elif action1 == "M":
                 mainmenu()
             elif action1 == "Q":
@@ -113,16 +117,32 @@ def shop():
         screen.blit(text, text_rect)
         # Tells the user what they can do in the shop
         font = pygame.font.Font('freesansbold.ttf', 20)
-        text = font.render(str("HERE YOU CAN SPEND YOU HARD EARNED COINS ON COSMETIC UPGRADES"), 1, WHITE)
+        text = font.render(str("HERE YOU CAN SPEND YOUR HARD EARNED COINS ON COSMETIC UPGRADES"), 1, WHITE)
         text_rect = text.get_rect(center=(960, 120))
         screen.blit(text, text_rect)
+
+        # This is essentially the same as the loadcoins() method but we must recreate the loading of coins in the same method as where they are changed because of python having difficulties with passing variables by reference
+        # We get the variable "coins" from the file "coins.txt"
+        coins = 0 # Initiates the variable
+        # Try to read coins from a file
+        try:
+            coins_file = open("coins.txt", "r") # Reads the text file and saves it to the coins_file variable
+            coins = int(coins_file.read()) # saves the number read from the text file to the coins variable
+            coins_file.close() # closes the coins variable
+        except:
+            # If there is some kind of error, set the coins variable to 0
+            coins = 0
+        # Displays the player's coins in the endscreen
+        font = pygame.font.Font('freesansbold.ttf', 30)
+        text = font.render(("COINS: " + str(coins)), 1, WHITE)
+        screen.blit(text, (20, 20))
 
         # Shows a preview of the skin in the shop
         # I made the button larger do I could fit in a completely unrelated (not part of the button function) piece of text that shows the price of the skin
         screen.blit(pygame.image.load("shopmariopreview.PNG"),(330,200))
-        button_1("MARIO",330,450,250,80,WHITE,GREY,1,"3")
+        button_1("MARIO",330,450,250,80,WHITE,GREY,1,"6")
         font = pygame.font.Font('freesansbold.ttf', 15)
-        text = font.render(str("FREE - DEFAULT"), 1, WHITE)
+        text = font.render(str("FREE - DEFAULT - APPLY SKIN?"), 1, WHITE)
         text_rect = text.get_rect(center=(455, 515))
         screen.blit(text, text_rect)
 
@@ -148,9 +168,9 @@ def shop():
             text_rect = text.get_rect(center=(755, 515))
             screen.blit(text, text_rect)
         else:
-            button_1("LUIGI",630,450,250,80,WHITE,GREY,0,"0")
-            font = pygame.font.Font('freesansbold.ttf', 15)
-            text = font.render(str("ALREADY PURCHASED"), 1, WHITE)
+            button_1("LUIGI",630,450,250,80,WHITE,GREY,2,"6")
+            font = pygame.font.Font('freesansbold.ttf', 13)
+            text = font.render(str("ALREADY PURCHASED - APPLY SKIN?"), 1, WHITE)
             text_rect = text.get_rect(center=(755, 515))
             screen.blit(text, text_rect)
 
@@ -210,25 +230,25 @@ def skinpurchased(skinselected):
             # If there is some kind of error, set the luigipurchased variable to False
             luigipurchased = False
 
-    # If the player has at least 1000 coins, they have enough money to make the purchase and the purchase is made (and they haven't already purchased the skin) we minus 1000 from coins and give them access to the skin. If the player does not have enough money, this is printed in the console and they are returned to the shop
-    if coins >= 1000 and luigipurchased == False:
-        coins -= 1000
-        luigipurchased = True
-        # We write to the text file that we have purchased the luigi skin by writing "True"
-        # Save the new value for coins to the text file
-        try:
-            # Write the file to disk
-            luigi_file = open("purchasedluigi.txt", "w")
-            luigi_file.write(str(luigipurchased))
-            luigi_file.close()
-            print("Transaction confirmed")
-        except:
-            # Can't write it
-            print("Unable to write whether luigi was purchased.")
-        shop()
-    else:
-        print("You do not have sufficient funds to make the purchase")
-        shop()
+        # If the player has at least 1000 coins, they have enough money to make the purchase and the purchase is made (and they haven't already purchased the skin) we minus 1000 from coins and give them access to the skin. If the player does not have enough money, this is printed in the console and they are returned to the shop
+        if coins >= 1000 and luigipurchased == False:
+            coins -= 1000
+            luigipurchased = True
+            # We write to the text file that we have purchased the luigi skin by writing "True"
+            # Save the new value for coins to the text file
+            try:
+                # Write the file to disk
+                luigi_file = open("purchasedluigi.txt", "w")
+                luigi_file.write(str(luigipurchased))
+                luigi_file.close()
+                print("Transaction confirmed")
+            except:
+                # Can't write it
+                print("Unable to write whether luigi was purchased.")
+            shop()
+        else:
+            print("You do not have sufficient funds to make the purchase")
+            shop()
 
     # Save the new value for coins to the text file
     try:
@@ -239,6 +259,45 @@ def skinpurchased(skinselected):
     except:
         # Can't write it
         print("Unable to save coins.")
+
+# Confirm selection method - used when the user tries to select a skin in the shop, they must confirm their selection - confirming their selection applies the specific skin to the object within the game
+def confirmselection():
+    confirm = True
+    while confirm:
+        for event in pygame.event.get(): # User did something
+            if event.type == pygame.QUIT: # If user clicked close
+                confirm = False # Flag that we are done so we exit this loop
+                pygame.quit # If the cross in the top right is pressed while in the menu, we exit the game
+            elif event.type==pygame.KEYDOWN:
+                if event.key==pygame.K_ESCAPE: 
+                    confirm = False
+        # -- Drawing the menu screen
+        screen.fill(BLACK)
+        # Displays "CONFIRM PURCHASE" text
+        font = pygame.font.Font('freesansbold.ttf', 60)
+        text = font.render(str("CONFIRM SELECTION"), 1, WHITE)
+        text_rect = text.get_rect(center=(960, 400))
+        screen.blit(text, text_rect)
+        button_1("YES",690,450,250,60,WHITE,GREY,0,"7") # This button is pressed when the user is confirming the selection for the skin they previously clicked on
+        button_1("NO",980,450,250,60,WHITE,GREY,0,"5") # This button is pressed when the user is declining the selection for the skin they previously clicked on
+
+        pygame.display.flip()
+        clock.tick(60)
+
+# This actually applies the skin that the user previously selected and confirmed to the real game.
+# The skinapplied variable is then used in the game loop and game class to apply the correct skin 
+# Index to the skinapplied variables and their meaning: 1 = Default (red) Mario, 2 = Luigi (green Mario)
+def applyskin(skinselected):
+    skinapplied = skinselected
+    # Save the new value for skinapplied to the corresponding text file so that this skin is loaded the next time that the game is opened.
+    try:
+        # Write the file to disk
+        coins_file = open("currentskinapplied.txt", "w")
+        coins_file.write(str(skinapplied))
+        coins_file.close()
+    except:
+        # Can't write it
+        print("Unable to save skinapplied.")
 
 def gameloop():
     done = False
@@ -1602,7 +1661,7 @@ def gameloop():
                 text_rect = text.get_rect(center=(960, 350))
                 screen.blit(text, text_rect)
 
-                # Displayes the player's coins in the endscreen
+                # Displays the player's coins in the endscreen
                 font = pygame.font.Font('freesansbold.ttf', 30)
                 text = font.render(("COINS: " + str(self.coins)), 1, WHITE)
                 text_rect = text.get_rect(center=(960, 425))
