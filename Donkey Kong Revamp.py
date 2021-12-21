@@ -81,6 +81,7 @@ def button_1(msg1,xb1,yb1,wb1,hb1,icb1,acb1,buttonpressed,action1=None): # msg1 
                 confirmselection()
             elif action1 == "7":
                 applyskin(skinselected)
+                shop() # This returns us back to the shop once yes has been pressed from the confirmskin screen
             elif action1 == "M":
                 mainmenu()
             elif action1 == "Q":
@@ -298,7 +299,6 @@ def applyskin(skinselected):
     except:
         # Can't write it
         print("Unable to save skinapplied.")
-    shop() # This returns us back to the shop once yes has been pressed from the confirmskin screen
 
 def gameloop():
     done = False
@@ -480,28 +480,9 @@ def gameloop():
         # Define the constructor for the player
         def __init__(self, color, width, height, x_speed, y_speed, x, y):
             # Call the super class (the super class for the player is sprite)
-            super().__init__()
+            super().__init__(color, width, height, x_speed, y_speed, x, y)
             # Set the position of the sprite
             self.image = pygame.image.load('luigi1.PNG') # This is OVERRIDED to account for the different array of skins being loaded when luigi moves in comparison to mario
-            self.currentleftimage = 0 # The start variable for the array image
-            self.currentrightimage = 0 # The start variable for the array image
-            self.rect = self.image.get_rect()
-            self.rect.x = x
-            self.rect.y = y
-            # Set a speed vector
-            self.change_x = 0
-            self.change_y = 0
-            # Flags
-            self.isJump = False
-            self.gravity = True
-            self.moveright = False
-            self.moveleft = False
-            # Variables
-            self.startjumptime = 0
-            self.animationcounterleft = 0
-            self.animationcounterright = 0
-            self.startposx = 0
-            self.startposy = 0
         
         # This is overrided to account for the different array of skins being loaded when luigi moves in comparison to mario
         def animateleft(self):
