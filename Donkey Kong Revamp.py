@@ -75,13 +75,10 @@ def button_1(msg1,xb1,yb1,wb1,hb1,icb1,acb1,buttonpressed,action1=None): # msg1 
                 confirmpurchase() # This calls the method that requests the user confirms their purchase for the skin
             elif action1 == "4":
                 skinpurchased(skinselected) # This calls the method that removes the user's coins in exchange for the skin
-            elif action1 == "5": # If the user presses "no" on the confirm purchase screen, they are taken back to the shop
-                shop()
-            elif action1 == "6":
+            elif action1 == "5":
                 confirmselection()
-            elif action1 == "7":
+            elif action1 == "6":
                 applyskin(skinselected)
-                shop() # This returns us back to the shop once yes has been pressed from the confirmskin screen
             elif action1 == "M":
                 mainmenu()
             elif action1 == "Q":
@@ -141,7 +138,7 @@ def shop():
         # Shows a preview of the skin in the shop
         # I made the button larger do I could fit in a completely unrelated (not part of the button function) piece of text that shows the price of the skin
         screen.blit(pygame.image.load("shopmariopreview.PNG"),(330,200))
-        button_1("MARIO",330,450,250,80,WHITE,GREY,1,"6")
+        button_1("MARIO",330,450,250,80,WHITE,GREY,1,"5")
         font = pygame.font.Font('freesansbold.ttf', 15)
         text = font.render(str("FREE - DEFAULT - APPLY SKIN?"), 1, WHITE)
         text_rect = text.get_rect(center=(455, 515))
@@ -169,7 +166,7 @@ def shop():
             text_rect = text.get_rect(center=(755, 515))
             screen.blit(text, text_rect)
         else:
-            button_1("LUIGI",630,450,250,80,WHITE,GREY,2,"6")
+            button_1("LUIGI",630,450,250,80,WHITE,GREY,2,"5")
             font = pygame.font.Font('freesansbold.ttf', 13)
             text = font.render(str("ALREADY PURCHASED - APPLY SKIN?"), 1, WHITE)
             text_rect = text.get_rect(center=(755, 515))
@@ -200,7 +197,7 @@ def confirmpurchase():
         text_rect = text.get_rect(center=(960, 400))
         screen.blit(text, text_rect)
         button_1("YES",690,450,250,60,WHITE,GREY,0,"4") # This button is pressed when the user is confirming the purchase for the skin they previously clicked on
-        button_1("NO",980,450,250,60,WHITE,GREY,0,"5") # This button is pressed when the user is declining the purchase for the skin they previously clicked on
+        button_1("NO",980,450,250,60,WHITE,GREY,0,"2") # This button is pressed when the user is declining the purchase for the skin they previously clicked on
 
         pygame.display.flip()
         clock.tick(60)
@@ -279,8 +276,8 @@ def confirmselection():
         text = font.render(str("CONFIRM SELECTION"), 1, WHITE)
         text_rect = text.get_rect(center=(960, 400))
         screen.blit(text, text_rect)
-        button_1("YES",690,450,250,60,WHITE,GREY,0,"7") # This button is pressed when the user is confirming the selection for the skin they previously clicked on
-        button_1("NO",980,450,250,60,WHITE,GREY,0,"5") # This button is pressed when the user is declining the selection for the skin they previously clicked on
+        button_1("YES",690,450,250,60,WHITE,GREY,0,"6") # This button is pressed when the user is confirming the selection for the skin they previously clicked on
+        button_1("NO",980,450,250,60,WHITE,GREY,0,"2") # This button is pressed when the user is declining the selection for the skin they previously clicked on
 
         pygame.display.flip()
         clock.tick(60)
@@ -296,6 +293,7 @@ def applyskin(skinselected):
         skin_file = open("currentskinapplied.txt", "w")
         skin_file.write(str(skinapplied))
         skin_file.close()
+        print("SKIN APPLIED:", skinapplied)
     except:
         # Can't write it
         print("Unable to save skinapplied.")
