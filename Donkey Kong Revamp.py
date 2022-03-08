@@ -51,7 +51,8 @@ def mainmenu():
 
         button_1("PLAY",840,330,250,60,WHITE,GREY,0,"1")
         button_1("SHOP",840,410,250,60,WHITE,GREY,0,"2")
-        button_1("QUIT",840,490,250,60,WHITE,GREY,0,"Q")
+        button_1("INSTRUCTIONS",840,490,250,60,WHITE,GREY,0,"7")
+        button_1("QUIT",840,570,250,60,WHITE,GREY,0,"Q")
             
         pygame.display.flip()
         clock.tick(60)
@@ -79,6 +80,8 @@ def button_1(msg1,xb1,yb1,wb1,hb1,icb1,acb1,buttonpressed,action1=None): # msg1 
                 confirmselection()
             elif action1 == "6":
                 applyskin(skinselected)
+            elif action1 == "7":
+                instructions()
             elif action1 == "M":
                 mainmenu()
             elif action1 == "Q":
@@ -110,7 +113,7 @@ def shop():
         screen.fill(BLACK)
         # Displays "THE SHOP"
         font = pygame.font.Font('freesansbold.ttf', 84)
-        text = font.render(str("THE SHOP"), 1, WHITE)
+        text = font.render(str("SHOP"), 1, WHITE)
         text_rect = text.get_rect(center=(960, 75))
         screen.blit(text, text_rect)
         # Tells the user what they can do in the shop
@@ -297,6 +300,32 @@ def applyskin(skinselected):
     except:
         # Can't write it
         print("Unable to save skinapplied.")
+
+# The method for the instruction screen - ensures good/ easy usability
+def instructions():
+    instructionsscreen = True
+    while instructionsscreen:
+        for event in pygame.event.get(): # User did something
+            if event.type == pygame.QUIT: # If user clicked close
+                instructionsscreen = False # Flag that we are done so we exit this loop
+                pygame.quit # If the cross in the top right is pressed while in the menu, we exit the game
+            elif event.type==pygame.KEYDOWN:
+                if event.key==pygame.K_ESCAPE: 
+                    instructionsscreen = False
+        # Drawing the menu screen
+        screen.fill(BLACK)
+
+        # Displays "INSTRUCTIONS" on the screen
+        font = pygame.font.Font('freesansbold.ttf', 84)
+        text = font.render(str("INSTRUCTIONS"), 1, WHITE)
+        text_rect = text.get_rect(center=(960, 75))
+        screen.blit(text, text_rect)
+
+        # Displays an image which concisely contains the instructions for the game and some explanatory images centered on the screen
+        screen.blit((pygame.image.load('instructionsimage.PNG')),(307,132))
+
+        pygame.display.flip()
+        clock.tick(60)
 
 def gameloop():
     done = False
